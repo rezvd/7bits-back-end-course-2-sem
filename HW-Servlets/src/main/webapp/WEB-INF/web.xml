@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<web-app>
+    <servlet>
+        <servlet-name>taskServlet</servlet-name>
+        <servlet-class>it.sevenbits.hw_servlets.task.ServletTask</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>taskServlet</servlet-name>
+        <url-pattern>/task</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>tasksServlet</servlet-name>
+        <servlet-class>it.sevenbits.hw_servlets.task.ServletTasks</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>tasksServlet</servlet-name>
+        <url-pattern>/tasks</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>sessionServlet</servlet-name>
+        <servlet-class>it.sevenbits.hw_servlets.session.ServletSession</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>sessionServlet</servlet-name>
+        <url-pattern>/session</url-pattern>
+    </servlet-mapping>
+</web-app>
