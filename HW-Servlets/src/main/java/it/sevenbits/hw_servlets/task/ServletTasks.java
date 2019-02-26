@@ -16,9 +16,10 @@ public class ServletTasks extends HttpServlet {
         SessionRepository sessions = SessionRepository.getInstance();
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-        String auth = req.getParameter("authorization");
-        if (!sessions.isSessionExists(auth)) {
-            resp.setStatus(401);
+        String auth = req.getHeader("Authorization");
+        if (auth == null || !sessions.isSessionExists(auth)) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("\"Session ID is not correct or it haven't been set\"");
             return;
         }
         TasksRepository tasks = TasksRepository.getInstance();
@@ -29,7 +30,7 @@ public class ServletTasks extends HttpServlet {
         }
         result.deleteCharAt(result.lastIndexOf(","));
         result.append("]");
-        resp.setStatus(200);
+        resp.setStatus(HttpServletResponse.SC_OK);
         resp.getWriter().write(result.toString());
     }
 
@@ -38,15 +39,16 @@ public class ServletTasks extends HttpServlet {
         SessionRepository sessions = SessionRepository.getInstance();
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-        String auth = req.getParameter("authorization");
+        String auth = req.getParameter("Authorization");
         if (!sessions.isSessionExists(auth)) {
-            resp.setStatus(401);
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("\"Session ID is not correct or it haven't been set\"");
             return;
         }
         TasksRepository tasks = TasksRepository.getInstance();
         String name = req.getParameter("name");
         String id = tasks.addTask(name);
-        resp.setStatus(201);
+        resp.setStatus(HttpServletResponse.SC_OK);
         resp.getWriter().write(String.format("{\n\"id\": \"%s\",\n\"name\": \"%s\"\n}", id, name));
     }
 }

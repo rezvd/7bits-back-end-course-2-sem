@@ -1,9 +1,9 @@
 package it.sevenbits.hw_servlets.task;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TasksRepository {
 
@@ -11,7 +11,7 @@ public class TasksRepository {
     private Map<String, String> tasks;
 
     private TasksRepository() {
-        tasks = new HashMap<String, String>();
+        tasks = new ConcurrentHashMap<String, String>();
         addTask("Task #1");
         addTask("Task #2");
     }

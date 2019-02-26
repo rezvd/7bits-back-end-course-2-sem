@@ -15,18 +15,19 @@ public class ServletTask extends HttpServlet {
         SessionRepository sessions = SessionRepository.getInstance();
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-        String auth = req.getParameter("authorization");
-        if (!sessions.isSessionExists(auth)) {
-            resp.setStatus(401);
+        String auth = req.getHeader("Authorization");
+        if (auth == null || !sessions.isSessionExists(auth)) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("\"Session ID is not correct or it haven't been set\"");
             return;
         }
         TasksRepository tasks = TasksRepository.getInstance();
         String id = req.getParameter("id");
-        if (tasks.isTaskExist(id)) {
-            resp.setStatus(200);
+        if (id != null && tasks.isTaskExist(id)) {
+            resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write(String.format("{ \"task\": \"%s\" } ", tasks.getTask(id)));
         } else {
-            resp.setStatus(404);
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("\"Task not found\"");
         }
     }
@@ -36,19 +37,20 @@ public class ServletTask extends HttpServlet {
         SessionRepository sessions = SessionRepository.getInstance();
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-        String auth = req.getParameter("authorization");
-        if (!sessions.isSessionExists(auth)) {
-            resp.setStatus(401);
+        String auth = req.getHeader("Authorization");
+        if (auth == null || !sessions.isSessionExists(auth)) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("\"Session ID is not correct or it haven't been set\"");
             return;
         }
         TasksRepository tasks = TasksRepository.getInstance();
         String id = req.getParameter("id");
-        if (tasks.isTaskExist(id)) {
-            resp.setStatus(200);
+        if (id != null && tasks.isTaskExist(id)) {
+            resp.setStatus(HttpServletResponse.SC_OK);
             tasks.delete(id);
             resp.getWriter().write(String.format("{ \"id\": \"%s\" }", id));
         } else {
-            resp.setStatus(404);
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("\"Task not found\"");
         }
     }

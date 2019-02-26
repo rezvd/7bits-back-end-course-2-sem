@@ -18,7 +18,6 @@
         <url-pattern>/tasks</url-pattern>
     </servlet-mapping>
 
-
     <servlet>
         <servlet-name>sessionServlet</servlet-name>
         <servlet-class>it.sevenbits.hw_servlets.session.ServletSession</servlet-class>

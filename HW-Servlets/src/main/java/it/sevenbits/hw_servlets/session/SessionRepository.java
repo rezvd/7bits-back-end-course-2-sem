@@ -1,9 +1,9 @@
 package it.sevenbits.hw_servlets.session;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionRepository {
 
@@ -11,7 +11,7 @@ public class SessionRepository {
     private Map<String, String> sessions;
 
     private SessionRepository() {
-        sessions = new HashMap<String, String>();
+        sessions = new ConcurrentHashMap<String, String>();
     }
 
     public static SessionRepository getInstance() {
