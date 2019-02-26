@@ -28,7 +28,9 @@ public class ServletTasks extends HttpServlet {
         for (Map.Entry entry : tasks.getEntrySet()) {
             result.append("\t{ \"").append(entry.getKey()).append("\": \"").append(entry.getValue()).append("\" },\n");
         }
-        result.deleteCharAt(result.lastIndexOf(","));
+        if(result.lastIndexOf(",") >= 0) {
+            result.deleteCharAt(result.lastIndexOf(","));
+        }
         result.append("]");
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.getWriter().write(result.toString());
