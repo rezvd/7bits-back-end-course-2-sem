@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<web-app>
+    <servlet>
+        <servlet-name>rootServlet</servlet-name>
+        <servlet-class>it.sevenbits.w1_servlets.RootServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>rootServlet</servlet-name>
+        <url-pattern>/task</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>rootServletForTasks</servlet-name>
+        <servlet-class>it.sevenbits.w1_servlets.RootServletForTasks</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>rootServletForTasks</servlet-name>
+        <url-pattern>/tasks</url-pattern>
+    </servlet-mapping>
+</web-app>
