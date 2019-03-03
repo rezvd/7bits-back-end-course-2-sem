@@ -41,7 +41,7 @@ public class ServletTasks extends HttpServlet {
         SessionRepository sessions = SessionRepository.getInstance();
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-        String auth = req.getParameter("Authorization");
+        String auth = req.getHeader("Authorization");
         if (!sessions.isSessionExists(auth)) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             resp.getWriter().write("\"Session ID is not correct or it haven't been set\"");
