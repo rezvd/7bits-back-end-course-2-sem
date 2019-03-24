@@ -15,11 +15,11 @@ import java.net.URI;
 import java.util.List;
 
 @Controller
-@RequestMapping("/items")
-public class ItemsController {
+@RequestMapping("/tasks")
+public class TasksController {
     private final ITasksRepository ITasksRepository;
 
-    public ItemsController(ITasksRepository ITasksRepository){
+    public TasksController(ITasksRepository ITasksRepository){
         this.ITasksRepository = ITasksRepository;
     }
 
@@ -33,7 +33,7 @@ public class ItemsController {
     @ResponseBody
     public ResponseEntity<Task> create(@RequestBody AddTaskRequest taskRequest) {
         Task createdTask = ITasksRepository.create(taskRequest.getText());
-        URI location = UriComponentsBuilder.fromPath("/items/")
+        URI location = UriComponentsBuilder.fromPath("/tasks/")
                 .path(String.valueOf(createdTask.getId()))
                 .build().toUri();
         return ResponseEntity.created(location).body(createdTask);
