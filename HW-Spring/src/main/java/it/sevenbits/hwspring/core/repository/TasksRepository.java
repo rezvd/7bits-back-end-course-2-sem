@@ -28,7 +28,7 @@ public class TasksRepository implements ITasksRepository {
     @Override
     public Task create(final String text) {
         String id = getNextID();
-        Task newTask = new Task(id, text, "inbox", new Date());
+        Task newTask = new Task(id, text, "inbox", new Date(), null);
         tasks.put(id, newTask);
         return newTask;
     }

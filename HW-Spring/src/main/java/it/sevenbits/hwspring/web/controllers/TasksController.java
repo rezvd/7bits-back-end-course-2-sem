@@ -32,8 +32,8 @@ public class TasksController {
     @RequestMapping(method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<Task> getAllTasks(final @RequestParam(value = "status", defaultValue = "inbox") String status) {
-        return tasksRepository.getAllTasksByStatus(status);
+    public ResponseEntity<List<Task>> getAllTasks(final @RequestParam(value = "status", defaultValue = "inbox") String status) {
+        return new ResponseEntity<>(tasksRepository.getAllTasksByStatus(status), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}",
@@ -48,14 +48,12 @@ public class TasksController {
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
-
     @RequestMapping(value = "/{id}",
             method = RequestMethod.PATCH,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity update(final @PathVariable String id, final
-        @RequestBody @Valid PatchTaskRequest patchTaskRequest) throws NotFoundException {
+    public ResponseEntity update(final @PathVariable String id, final @RequestBody @Valid PatchTaskRequest patchTaskRequest) throws NotFoundException {
         Task previousTask = tasksRepository.getById(id);
         if (previousTask == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
@@ -68,7 +66,7 @@ public class TasksController {
         if (!(patchTaskRequest.getText() == null || patchTaskRequest.getText().equals(""))) {
             text = patchTaskRequest.getText();
         }
-        tasksRepository.update(new Task(id, text, status, new Date()));
+        tasksRepository.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date()));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -90,6 +88,6 @@ public class TasksController {
     @ResponseBody
     public ResponseEntity create(final @RequestBody @Valid AddTaskRequest taskRequest) {
         tasksRepository.create(taskRequest.getText());
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 }

@@ -16,16 +16,18 @@ public class Task {
     private String status;
     @NotBlank
     private Date createdAt;
+    private Date updatedAt;
 
-    //TODO check this
     @JsonCreator
     public Task(final @JsonProperty("id") String id,
                 final @JsonProperty("text") String text,
                 final @JsonProperty("status") String status,
-                final @JsonProperty("createdAt") Date date) {
+                final @JsonProperty("createdAt") Date createdAt,
+                final @JsonProperty("updatedAt") Date updatedAt) {
         this.id = id;
         this.text = text;
-        this.createdAt = date;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.status = status;
     }
 
@@ -41,16 +43,12 @@ public class Task {
         return status;
     }
 
-    public void setStatus(final String status) {
-        this.status = status;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(final Date createdAt) {
-        this.createdAt = createdAt;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 }
 
