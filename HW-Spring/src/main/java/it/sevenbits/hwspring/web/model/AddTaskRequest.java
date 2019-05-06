@@ -4,14 +4,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * Model for creating task
+ */
 public class AddTaskRequest {
     @NotBlank
     private String text;
 
+    /**
+     * Constructor for AddTaskRequest
+     * @param text is the text of future task. Can be obtained from json
+     */
     public AddTaskRequest(final @JsonProperty("text") String text) {
         this.text = text;
     }
 
+    /**
+     * Getter for text of the future task
+     * @return text of task
+     */
     public String getText() {
         return text;
     }

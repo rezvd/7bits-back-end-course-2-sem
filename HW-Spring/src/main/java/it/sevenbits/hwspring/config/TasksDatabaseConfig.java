@@ -8,12 +8,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-
 import javax.sql.DataSource;
 
+/**
+ * Set configuration for work with database
+ */
 @Configuration
 public class TasksDatabaseConfig {
 
+    /**
+     * Creates DataSource for connections to database
+     * @return ready DataSource
+     */
     @Bean
     @FlywayDataSource
     @Qualifier("tasksDataSource")
@@ -22,12 +28,14 @@ public class TasksDatabaseConfig {
         return DataSourceBuilder.create().build();
     }
 
+    /**
+     * Creates JDBC operations
+     * @param tasksDataSource is DataSource for connection to database
+     * @return ready JdbcTemplate for work with database
+     */
     @Bean
     @Qualifier("tasksJdbcOperations")
-    public JdbcOperations tasksJdbcOperations(
-            @Qualifier("tasksDataSource")
-                    DataSource tasksDataSource
-    ) {
+    public JdbcOperations tasksJdbcOperations(final @Qualifier("tasksDataSource") DataSource tasksDataSource) {
         return new JdbcTemplate(tasksDataSource);
     }
 

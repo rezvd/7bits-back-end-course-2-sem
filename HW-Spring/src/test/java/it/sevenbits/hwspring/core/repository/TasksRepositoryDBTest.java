@@ -50,23 +50,6 @@ public class TasksRepositoryDBTest {
         Assert.assertSame(expectedList, mockTasks);
     }
 
-    @Test
-    public void getAllTasksInvalidStatusTest() {
-        String status = "unknownStatus";
-        List<Task> mockTasks = mock(List.class);
-
-        when(mockJdbc.query(anyString(), any(RowMapper.class), anyString())).thenReturn(mockTasks);
-
-        List<Task> expectedList = tasksRepository.getAllTasksByStatus(status);
-
-        verify(mockJdbc, times(0)).query(
-                eq("SELECT id, text, status, createdAt, updatedAt FROM task WHERE status = ?"),
-                any(RowMapper.class),
-                eq(status)
-        );
-
-        Assert.assertEquals(expectedList, new ArrayList<>());
-    }
 
     @Test
     public void getTaskByIdTest() {
@@ -83,19 +66,6 @@ public class TasksRepositoryDBTest {
         );
 
         Assert.assertSame(task, expected);
-    }
-
-    @Test
-    public void getTaskByInvalidIdTest() {
-        String id = "someID";
-        Task task = mock(Task.class);
-
-        when(mockJdbc.queryForObject(anyString(), any(RowMapper.class), anyString())).thenReturn(task);
-
-        Task expected = tasksRepository.getById(id);
-        verifyZeroInteractions(mockJdbc);
-
-        Assert.assertNull(expected);
     }
 
     @Test

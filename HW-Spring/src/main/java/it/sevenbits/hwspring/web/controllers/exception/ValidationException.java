@@ -1,14 +1,14 @@
 package it.sevenbits.hwspring.web.controllers.exception;
 
 /**
- * Exception to alert, that needed object wasn't found
+ * Exception to alert, that validation was failed
  */
-public class NotFoundException extends Exception {
+public class ValidationException extends Exception {
 
     /**
      * Default constructor without any parameters
      */
-    public NotFoundException() {
+    public ValidationException() {
         super();
     }
 
@@ -16,7 +16,7 @@ public class NotFoundException extends Exception {
      * Constructor with message
      * @param message contains information about exception
      */
-    public NotFoundException(final String message) {
+    public ValidationException(final String message) {
         super(message);
     }
 
@@ -24,7 +24,7 @@ public class NotFoundException extends Exception {
      * Constructor with cause of an exception
      * @param throwable is a cause of an exception
      */
-    public NotFoundException(final Throwable throwable) {
+    public ValidationException(final Throwable throwable) {
         super(throwable);
     }
 
@@ -33,7 +33,7 @@ public class NotFoundException extends Exception {
      * @param message contains information about exception
      * @param throwable is a cause of an exception
      */
-    public NotFoundException(final String message, final Throwable throwable) {
+    public ValidationException(final String message, final Throwable throwable) {
         super(message, throwable);
     }
 }

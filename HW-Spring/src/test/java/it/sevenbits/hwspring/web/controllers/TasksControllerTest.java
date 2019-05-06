@@ -3,8 +3,8 @@ package it.sevenbits.hwspring.web.controllers;
 
 import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.repository.ITasksRepository;
-import it.sevenbits.hwspring.core.repository.TasksRepository;
 import it.sevenbits.hwspring.web.controllers.exception.NotFoundException;
+import it.sevenbits.hwspring.web.controllers.exception.ValidationException;
 import it.sevenbits.hwspring.web.model.AddTaskRequest;
 import it.sevenbits.hwspring.web.model.PatchTaskRequest;
 import org.junit.Before;
@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +37,7 @@ public class TasksControllerTest {
     }
 
     @Test
-    public void getAllTasksTest() {
+    public void getAllTasksTest() throws ValidationException {
         String status = "inbox";
         List<Task> mockTasks = mock(List.class);
         when(tasksRepository.getAllTasksByStatus(anyString())).thenReturn(mockTasks);
@@ -48,8 +47,16 @@ public class TasksControllerTest {
         assertSame(mockTasks, answer.getBody());
     }
 
+    @Test (expected = ValidationException.class)
+    public void getAllTasksInvalidStatusTest() throws ValidationException {
+        String status = "someStatus";
+        ResponseEntity<List<Task>> answer = tasksController.getAllTasks(status);
+        verifyZeroInteractions(tasksRepository);
+        assertEquals(HttpStatus.BAD_REQUEST, answer.getStatusCode());
+    }
+
     @Test
-    public void getByIdTest() throws NotFoundException {
+    public void getByIdTest() throws NotFoundException, ValidationException {
         String id = UUID.randomUUID().toString();
         Task mockTask = mock(Task.class);
         when(tasksRepository.getById(anyString())).thenReturn(mockTask);
@@ -60,7 +67,7 @@ public class TasksControllerTest {
     }
 
     @Test (expected = NotFoundException.class)
-    public void getByIdNotFoundTest() throws NotFoundException {
+    public void getByIdNotFoundTest() throws NotFoundException, ValidationException {
         String id = UUID.randomUUID().toString();
         when(tasksRepository.getById(anyString())).thenReturn(null);
         ResponseEntity answer = tasksController.getByID(id);
@@ -68,12 +75,21 @@ public class TasksControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, answer.getStatusCode());
     }
 
+    @Test (expected = ValidationException.class)
+    public void getByIdInvalidTest() throws NotFoundException, ValidationException {
+        String id = "unknown id";
+        Task mockTask = mock(Task.class);
+        ResponseEntity answer = tasksController.getByID(id);
+        verifyZeroInteractions(tasksRepository);
+        assertEquals(HttpStatus.BAD_REQUEST, answer.getStatusCode());
+    }
+
     @Test
-    public void updateTest() throws NotFoundException {
+    public void updateTest() throws NotFoundException, ValidationException {
         String id = UUID.randomUUID().toString();
         Task mockTask = mock(Task.class);
         String text = "Do homework";
-        String status = "Done";
+        String status = "done";
 
         PatchTaskRequest request = new PatchTaskRequest(text, status);
         when(tasksRepository.getById(anyString())).thenReturn(mockTask);
@@ -83,10 +99,10 @@ public class TasksControllerTest {
     }
 
     @Test (expected = NotFoundException.class)
-    public void updateNotFoundTest() throws NotFoundException {
+    public void updateNotFoundTest() throws NotFoundException, ValidationException {
         String id = UUID.randomUUID().toString();
         String text = "Do homework";
-        String status = "Done";
+        String status = "done";
 
         PatchTaskRequest request = new PatchTaskRequest(text, status);
         when(tasksRepository.getById(anyString())).thenReturn(null);
@@ -96,7 +112,7 @@ public class TasksControllerTest {
     }
 
     @Test
-    public void deleteTest() throws NotFoundException {
+    public void deleteTest() throws NotFoundException, ValidationException {
         String id = UUID.randomUUID().toString();
         Task mockTask = mock(Task.class);
 
@@ -107,17 +123,27 @@ public class TasksControllerTest {
     }
 
     @Test (expected = NotFoundException.class)
-    public void deleteNotFoundTest() throws NotFoundException {
-        String id = "unknownID";
+    public void deleteNotFoundTest() throws NotFoundException, ValidationException {
+        String id = UUID.randomUUID().toString();
         when(tasksRepository.getById(anyString())).thenReturn(null);
         ResponseEntity answer = tasksController.delete(id);
         verifyNoMoreInteractions(tasksRepository);
         assertEquals(HttpStatus.NOT_FOUND, answer.getStatusCode());
     }
 
+    @Test (expected = ValidationException.class)
+    public void deleteInvalidIdTest() throws NotFoundException, ValidationException {
+        String id = "unknownID";
+        ResponseEntity answer = tasksController.delete(id);
+        verifyNoMoreInteractions(tasksRepository);
+        assertEquals(HttpStatus.BAD_REQUEST, answer.getStatusCode());
+    }
+
     @Test
     public void createTest() {
         String text = "Do homework";
+        Task mockTask = mock(Task.class);
+        when(tasksRepository.create(anyString())).thenReturn(mockTask);
         ResponseEntity answer = tasksController.create(new AddTaskRequest(text));
         verify(tasksRepository, times(1)).create(text);
         assertEquals(HttpStatus.CREATED, answer.getStatusCode());

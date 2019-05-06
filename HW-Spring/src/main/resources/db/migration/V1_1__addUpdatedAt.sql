@@ -1,1 +1,1 @@
-alter table task add column updatedAt timestamp;
+ALTER TABLE task add column updatedAt timestamp;
