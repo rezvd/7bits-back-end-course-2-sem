@@ -17,15 +17,12 @@ public final class StatusValidator {
 
     /**
      * Validates status
-     * @param status is the status, with will be checked
+     * @param status is the status, which will be checked
      * @return true, if the status is valid, otherwise return false
      */
     public static boolean isValid(final String status) {
         statuses.add("inbox");
         statuses.add("done");
-        if (status == null) {
-            return false;
-        }
         return statuses.contains(status);
     }
 }

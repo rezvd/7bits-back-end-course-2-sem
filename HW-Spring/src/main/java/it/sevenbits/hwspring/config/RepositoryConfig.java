@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 public class RepositoryConfig {
 
     /**
-     * Set certain implementation on repository
+     * Set certain implementation of repository
      * @param jdbcOperations sets basic JDBC operations
      * @return ready instance of tasks repository
      */

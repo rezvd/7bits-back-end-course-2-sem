@@ -21,15 +21,10 @@ public class TasksRepositoryDB implements ITasksRepository {
         this.jdbcOperations = jdbcOperations;
     }
 
-    /**
-     * Selects tasks by status
-     * @param status is for selection tasks
-     * @return list of tasks with certain status
-     */
     @Override
-    public List<Task> getAllTasksByStatus(final String status) {
-        return  jdbcOperations.query(
-                "SELECT id, text, status, createdAt, updatedAt FROM task WHERE status = ?",
+    public List<Task> getTasksWithPagination(final String status, final String order, final int page, final int pageSize) {
+        return  jdbcOperations.query(String.format("SELECT id, text, status, createdAt, updatedAt FROM task "
+                + "WHERE status = ? ORDER BY createdAt %s OFFSET ? LIMIT ?", order.toUpperCase()),
                 (resultSet, i) -> {
                     String id = resultSet.getString("id");
                     String name = resultSet.getString("text");
@@ -37,7 +32,7 @@ public class TasksRepositoryDB implements ITasksRepository {
                     Date createdAt = resultSet.getTimestamp("createdAt");
                     Date updatedAt = resultSet.getTimestamp("updatedAt");
                     return new Task(id, name, currentStatus, createdAt, updatedAt);
-                }, status);
+                }, status, (page - 1) * pageSize, pageSize);
     }
 
     /**
@@ -50,7 +45,7 @@ public class TasksRepositoryDB implements ITasksRepository {
     public Task create(final String text) {
         String id = getNextID();
         Date date = new Date();
-        int rows = jdbcOperations.update(
+        jdbcOperations.update(
                 "INSERT INTO task (id, text, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)",
                 id, text, "inbox", date, date
         );
@@ -102,6 +97,11 @@ public class TasksRepositoryDB implements ITasksRepository {
     @Override
     public void delete(final String id) {
         jdbcOperations.update("DELETE from Task WHERE id = ?", id);
+    }
+
+    @Override
+    public int count(final String status) {
+        return  jdbcOperations.queryForObject("SELECT COUNT (*) FROM task WHERE status = ?", Integer.class, status);
     }
 
     /**

@@ -10,11 +10,15 @@ import java.util.List;
 public interface ITasksRepository {
 
     /**
-     * Function for getting all tasks with certain status
+     * Function for getting all tasks with certain status and pagination
      * @param status is for selection tasks
-     * @return list of tasks with certain status
+     * @param order is he order to sort task. Can have values "desc" or "asc"
+     * @param page is the number of current page. Starts with 1
+     * @param pageSize is the size of the page
+     * @return list of tasks on current page with certain status in certain order.
+     * Size of the list cannot be greater then pageSize
      */
-    List<Task> getAllTasksByStatus(String status);
+    List<Task> getTasksWithPagination(String status, String order, int page, int pageSize);
 
     /**
      * Created new Task with selected text. Other parameters of task will be set by default
@@ -43,4 +47,11 @@ public interface ITasksRepository {
      * @param id is id of task, which will be deleted
      */
     void delete(String id);
+
+    /**
+     * Calculate number of tasks with certain status
+     * @param status is the status to select task
+     * @return number of tasks with this status
+     */
+    int count(String status);
 }

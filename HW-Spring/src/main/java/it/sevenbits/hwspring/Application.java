@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class Application {
-    
+
     /**
      * Start of an application
      * @param args can contain config or input data

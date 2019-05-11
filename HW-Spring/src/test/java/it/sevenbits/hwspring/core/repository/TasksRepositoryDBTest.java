@@ -7,18 +7,17 @@ import org.junit.Test;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class TasksRepositoryDBTest {
@@ -35,19 +34,25 @@ public class TasksRepositoryDBTest {
     @Test
     public void getAllTasksTest() {
         String status = "inbox";
+        int page = 1;
+        int pageSize = 25;
+        String order = "DESC";
         List<Task> mockTasks = mock(List.class);
 
-        when(mockJdbc.query(anyString(), any(RowMapper.class), anyString())).thenReturn(mockTasks);
+        when(mockJdbc.query(anyString(), any(RowMapper.class), anyString(), anyInt(), anyInt())).thenReturn(mockTasks);
 
-        List<Task> expectedList = tasksRepository.getAllTasksByStatus(status);
+        List<Task> actualList = tasksRepository.getTasksWithPagination(status, order, page, pageSize);
 
         verify(mockJdbc, times(1)).query(
-                eq("SELECT id, text, status, createdAt, updatedAt FROM task WHERE status = ?"),
+                eq(String.format("SELECT id, text, status, createdAt, updatedAt FROM task "
+                        + "WHERE status = ? ORDER BY createdAt %s OFFSET ? LIMIT ?", order)),
                 any(RowMapper.class),
-                eq(status)
+                eq(status),
+                eq((page - 1) * pageSize),
+                eq(pageSize)
         );
 
-        Assert.assertSame(expectedList, mockTasks);
+        Assert.assertSame(mockTasks, actualList);
     }
 
 
@@ -58,14 +63,14 @@ public class TasksRepositoryDBTest {
 
         when(mockJdbc.queryForObject(anyString(), any(RowMapper.class), anyString())).thenReturn(task);
 
-        Task expected = tasksRepository.getById(id);
+        Task actual = tasksRepository.getById(id);
         verify(mockJdbc, times(1)).queryForObject(
                 eq("SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?"),
                 any(RowMapper.class),
                 eq(id)
         );
 
-        Assert.assertSame(task, expected);
+        Assert.assertSame(task, actual);
     }
 
     @Test
@@ -96,6 +101,23 @@ public class TasksRepositoryDBTest {
                 eq("DELETE from Task WHERE id = ?"),
                 eq(id)
         );
+    }
+
+    @Test
+    public void countTest() {
+        String status = "inbox";
+        int count = 1;
+
+        when(mockJdbc.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(count);
+
+        int actual = tasksRepository.count(status);
+        verify(mockJdbc, times(1)).queryForObject(
+                eq("SELECT COUNT (*) FROM task WHERE status = ?"),
+                eq(Integer.class),
+                eq(status)
+        );
+
+        Assert.assertSame(count, actual);
     }
 
 }

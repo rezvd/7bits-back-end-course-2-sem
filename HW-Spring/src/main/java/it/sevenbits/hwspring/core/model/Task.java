@@ -7,6 +7,7 @@ import it.sevenbits.hwspring.core.service.validation.StatusConstraint;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Represents model of task
@@ -42,44 +43,45 @@ public class Task {
         this.status = status;
     }
 
-    /**
-     * Getter for id of the task
-     * @return unique identifier of the task
-     */
     public String getId() {
         return id;
     }
 
-    /**
-     * Gettet for text of task
-     * @return text of the task
-     */
     public String getText() {
         return text;
     }
 
-    /**
-     * Getter for status of the task
-     * @return status of the task
-     */
     public String getStatus() {
         return status;
     }
 
-    /**
-     * Getter for date and time, when the task was created
-     * @return date and time, when the task was created
-     */
     public Date getCreatedAt() {
         return createdAt;
     }
 
-    /**
-     * Getter for date and time, when the task was updated
-     * @return date and time, when the task was updated
-     */
     public Date getUpdatedAt() {
         return updatedAt;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Task task = (Task) o;
+        return Objects.equals(id, task.id) &&
+                Objects.equals(text, task.text) &&
+                Objects.equals(status, task.status) &&
+                Objects.equals(createdAt.toString(), task.createdAt.toString()) &&
+                Objects.equals(updatedAt.toString(), task.updatedAt.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, text, status, createdAt, updatedAt);
     }
 }
 

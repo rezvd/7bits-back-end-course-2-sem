@@ -1,6 +1,7 @@
 package it.sevenbits.hwspring.core.repository;
 
 import it.sevenbits.hwspring.core.model.Task;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,14 +28,24 @@ public class TasksRepository implements ITasksRepository {
      * @return list of tasks with certain status
      */
     @Override
-    public List<Task> getAllTasksByStatus(final String status) {
-        List<Task> tasksByList = new ArrayList<>();
+    public List<Task> getTasksWithPagination(final String status, final String order, final int page, final int pageSize)  {
+        List<Task> result = new ArrayList<>();
         for (Task current: tasks.values()) {
             if (current.getStatus().equals(status)) {
-                tasksByList.add(current);
+                result.add(current);
             }
         }
-        return tasksByList;
+        result.sort((t1, t2) -> {
+            if (t1.getCreatedAt().after(t2.getCreatedAt())) {
+                return order.equals("asc") ? 1 : -1;
+            } else if (t1.getCreatedAt().before(t2.getCreatedAt())) {
+                return order.equals("asc") ? -1 : +1;
+            } else if (t1.getCreatedAt().equals(t2.getCreatedAt())) {
+                return 0;
+            }
+            return 0;
+        });
+        return result;
     }
 
     /**
@@ -79,6 +90,11 @@ public class TasksRepository implements ITasksRepository {
     @Override
     public void delete(final String id) {
         tasks.remove(id);
+    }
+
+    @Override
+    public int count(final String status) {
+        return tasks.size();
     }
 
     /**

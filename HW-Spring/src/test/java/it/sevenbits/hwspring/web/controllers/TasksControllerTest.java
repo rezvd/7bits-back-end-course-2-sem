@@ -1,23 +1,29 @@
 package it.sevenbits.hwspring.web.controllers;
 
-
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.repository.ITasksRepository;
 import it.sevenbits.hwspring.web.controllers.exception.NotFoundException;
 import it.sevenbits.hwspring.web.controllers.exception.ValidationException;
 import it.sevenbits.hwspring.web.model.AddTaskRequest;
+import it.sevenbits.hwspring.web.model.Pagination;
 import it.sevenbits.hwspring.web.model.PatchTaskRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.web.util.UriComponentsBuilder;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -33,24 +39,53 @@ public class TasksControllerTest {
     @Before
     public void setup() {
         tasksRepository = mock(ITasksRepository.class);
-        tasksController = new TasksController(tasksRepository);
+        tasksController = new TasksController(tasksRepository, new Pagination(3, 50, 25, 1, "desc"));
     }
 
     @Test
     public void getAllTasksTest() throws ValidationException {
         String status = "inbox";
-        List<Task> mockTasks = mock(List.class);
-        when(tasksRepository.getAllTasksByStatus(anyString())).thenReturn(mockTasks);
-        ResponseEntity<List<Task>> answer = tasksController.getAllTasks(status);
-        verify(tasksRepository, times(1)).getAllTasksByStatus(status);
+        int page = 1;
+        int pageSize = 25;
+        String order = "desc";
+        List<Task> tasks = new ArrayList<>();
+        Date date = new Date();
+        tasks.add(new Task(UUID.randomUUID().toString(), "Do homework", status, date, date));
+        when(tasksRepository.getTasksWithPagination(anyString(), anyString(), anyInt(), anyInt())).thenReturn(tasks);
+        when(tasksRepository.count(anyString())).thenReturn(tasks.size());
+        ResponseEntity<String> answer = tasksController.getTasksWithPagination(status, order, page, pageSize);
+        verify(tasksRepository, times(1)).getTasksWithPagination(status, order, page, pageSize);
         assertEquals(HttpStatus.OK, answer.getStatusCode());
-        assertSame(mockTasks, answer.getBody());
+
+        Gson gson = new Gson();
+        JsonObject json =  gson.fromJson(answer.getBody(), JsonObject.class);
+        JsonObject meta = json.get("_meta").getAsJsonObject();
+        assertEquals(tasks.size(), meta.get("total").getAsInt());
+        assertEquals(page, meta.get("page").getAsInt());
+        assertEquals(pageSize, meta.get("size").getAsInt());
+        assertFalse(meta.has("prev"));
+        assertFalse(meta.has("next"));
+        String uri = UriComponentsBuilder.fromPath("/tasks")
+                .queryParam("status", status)
+                .queryParam("order", order)
+                .queryParam("page", page)
+                .queryParam("size", pageSize)
+                .build().toUri().toString();
+        assertEquals(uri, meta.get("first").getAsString());
+        assertEquals(uri, meta.get("last").getAsString());
+        JsonArray jsonTasks = json.get("tasks").getAsJsonArray();
+        assertEquals(tasks.size(), jsonTasks.size());
+        List<Task> actual = new ArrayList<>();
+        for(int i = 0; i < jsonTasks.size(); i++) {
+            actual.add(gson.fromJson(jsonTasks.get(i), Task.class));
+        }
+        assertEquals(tasks, actual);
     }
 
     @Test (expected = ValidationException.class)
     public void getAllTasksInvalidStatusTest() throws ValidationException {
         String status = "someStatus";
-        ResponseEntity<List<Task>> answer = tasksController.getAllTasks(status);
+        ResponseEntity<String> answer = tasksController.getTasksWithPagination(status, "desc", 1, 1);
         verifyZeroInteractions(tasksRepository);
         assertEquals(HttpStatus.BAD_REQUEST, answer.getStatusCode());
     }
