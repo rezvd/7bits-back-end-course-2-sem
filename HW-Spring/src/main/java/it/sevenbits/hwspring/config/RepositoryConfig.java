@@ -19,7 +19,7 @@ public class RepositoryConfig {
      * @return ready instance of tasks repository
      */
     @Bean
-    public ITasksRepository tasksRepository(final @Qualifier("tasksJdbcOperations") JdbcOperations jdbcOperations) {
+    public ITasksRepository tasksRepository(@Qualifier("tasksJdbcOperations") final JdbcOperations jdbcOperations) {
         return new TasksRepositoryDB(jdbcOperations);
     }
 }

@@ -23,9 +23,12 @@ public class TasksRepository implements ITasksRepository {
     }
 
     /**
-     * Selects tasks by status
-     * @param status is for selection tasks
-     * @return list of tasks with certain status
+     * Creates list of task for this page
+     * @param status is a status of the tasks
+     * @param order is an order to sort tasks
+     * @param page is current page
+     * @param pageSize is number of tasks on one page
+     * @return list of tasks with certain status in the certain order, which place on the certain page
      */
     @Override
     public List<Task> getTasksWithPagination(final String status, final String order, final int page, final int pageSize)  {

@@ -3,8 +3,12 @@ package it.sevenbits.hwspring.core.repository;
 import it.sevenbits.hwspring.core.model.Task;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -25,14 +29,7 @@ public class TasksRepositoryDB implements ITasksRepository {
     public List<Task> getTasksWithPagination(final String status, final String order, final int page, final int pageSize) {
         return  jdbcOperations.query(String.format("SELECT id, text, status, createdAt, updatedAt FROM task "
                 + "WHERE status = ? ORDER BY createdAt %s OFFSET ? LIMIT ?", order.toUpperCase()),
-                (resultSet, i) -> {
-                    String id = resultSet.getString("id");
-                    String name = resultSet.getString("text");
-                    String currentStatus = resultSet.getString("status");
-                    Date createdAt = resultSet.getTimestamp("createdAt");
-                    Date updatedAt = resultSet.getTimestamp("updatedAt");
-                    return new Task(id, name, currentStatus, createdAt, updatedAt);
-                }, status, (page - 1) * pageSize, pageSize);
+                (resultSet, i) -> buildTask(resultSet), status, (page - 1) * pageSize, pageSize);
     }
 
     /**
@@ -45,6 +42,8 @@ public class TasksRepositoryDB implements ITasksRepository {
     public Task create(final String text) {
         String id = getNextID();
         Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         jdbcOperations.update(
                 "INSERT INTO task (id, text, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)",
                 id, text, "inbox", date, date
@@ -62,14 +61,7 @@ public class TasksRepositoryDB implements ITasksRepository {
         try {
             return jdbcOperations.queryForObject(
                     "SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?",
-                    (resultSet, i) -> {
-                        String currentID = resultSet.getString("id");
-                        String name = resultSet.getString("text");
-                        String currentStatus = resultSet.getString("status");
-                        Date createdAt = resultSet.getTimestamp("createdAt");
-                        Date updatedAt = resultSet.getTimestamp("updatedAt");
-                        return new Task(currentID, name, currentStatus, createdAt, updatedAt);
-                    },
+                    (resultSet, i) -> buildTask(resultSet),
                     id);
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -110,5 +102,14 @@ public class TasksRepositoryDB implements ITasksRepository {
      */
     private String getNextID() {
         return UUID.randomUUID().toString();
+    }
+
+    private Task buildTask(final ResultSet resultSet) throws SQLException {
+        String id = resultSet.getString("id");
+        String name = resultSet.getString("text");
+        String currentStatus = resultSet.getString("status");
+        Date createdAt = resultSet.getTimestamp("createdAt");
+        Date updatedAt = resultSet.getTimestamp("updatedAt");
+        return new Task(id, name, currentStatus, createdAt, updatedAt);
     }
 }

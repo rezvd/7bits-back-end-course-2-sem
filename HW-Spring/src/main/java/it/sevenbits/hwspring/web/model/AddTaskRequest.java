@@ -15,7 +15,7 @@ public class AddTaskRequest {
      * Constructor for AddTaskRequest
      * @param text is the text of future task. Can be obtained from json
      */
-    public AddTaskRequest(final @JsonProperty("text") String text) {
+    public AddTaskRequest(@JsonProperty("text") final String text) {
         this.text = text;
     }
 

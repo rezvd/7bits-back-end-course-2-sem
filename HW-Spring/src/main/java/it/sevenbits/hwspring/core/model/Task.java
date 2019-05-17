@@ -31,11 +31,11 @@ public class Task {
      * @param updatedAt is the date and time, when this task was updated
      */
     @JsonCreator
-    public Task(final @JsonProperty("id") String id,
-                final @JsonProperty("text") String text,
-                final @JsonProperty("status") String status,
-                final @JsonProperty("createdAt") Date createdAt,
-                final @JsonProperty("updatedAt") Date updatedAt) {
+    public Task(@JsonProperty("id") final String id,
+                @JsonProperty("text") final String text,
+                @JsonProperty("status") final String status,
+                @JsonProperty("createdAt") final Date createdAt,
+                @JsonProperty("updatedAt") final Date updatedAt) {
         this.id = id;
         this.text = text;
         this.createdAt = createdAt;

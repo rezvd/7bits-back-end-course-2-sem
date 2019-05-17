@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import it.sevenbits.hwspring.core.model.Task;
-import it.sevenbits.hwspring.core.repository.ITasksRepository;
+import it.sevenbits.hwspring.core.service.TasksService;
 import it.sevenbits.hwspring.web.controllers.exception.NotFoundException;
 import it.sevenbits.hwspring.web.controllers.exception.ValidationException;
 import it.sevenbits.hwspring.web.model.AddTaskRequest;
@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,13 +32,13 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class TasksControllerTest {
-    private ITasksRepository tasksRepository;
     private TasksController tasksController;
+    private TasksService tasksService;
 
     @Before
     public void setup() {
-        tasksRepository = mock(ITasksRepository.class);
-        tasksController = new TasksController(tasksRepository, new Pagination(3, 50, 25, 1, "desc"));
+        tasksService = mock(TasksService.class);
+        tasksController = new TasksController(tasksService, new Pagination(3, 50, 25, 1, "desc"));
     }
 
     @Test
@@ -51,10 +50,11 @@ public class TasksControllerTest {
         List<Task> tasks = new ArrayList<>();
         Date date = new Date();
         tasks.add(new Task(UUID.randomUUID().toString(), "Do homework", status, date, date));
-        when(tasksRepository.getTasksWithPagination(anyString(), anyString(), anyInt(), anyInt())).thenReturn(tasks);
-        when(tasksRepository.count(anyString())).thenReturn(tasks.size());
+        when(tasksService.getTasksWithPagination(anyString(), anyString(), anyInt(), anyInt())).thenReturn(tasks);
+        when(tasksService.getTasksNumber(anyString())).thenReturn(tasks.size());
+        when(tasksService.getPagesNumber(anyString(), anyInt())).thenReturn(1);
         ResponseEntity<String> answer = tasksController.getTasksWithPagination(status, order, page, pageSize);
-        verify(tasksRepository, times(1)).getTasksWithPagination(status, order, page, pageSize);
+        verify(tasksService, times(1)).getTasksWithPagination(status, order, page, pageSize);
         assertEquals(HttpStatus.OK, answer.getStatusCode());
 
         Gson gson = new Gson();
@@ -65,12 +65,7 @@ public class TasksControllerTest {
         assertEquals(pageSize, meta.get("size").getAsInt());
         assertFalse(meta.has("prev"));
         assertFalse(meta.has("next"));
-        String uri = UriComponentsBuilder.fromPath("/tasks")
-                .queryParam("status", status)
-                .queryParam("order", order)
-                .queryParam("page", page)
-                .queryParam("size", pageSize)
-                .build().toUri().toString();
+        String uri = TasksService.getFirstPage(status, order, pageSize).toString();
         assertEquals(uri, meta.get("first").getAsString());
         assertEquals(uri, meta.get("last").getAsString());
         JsonArray jsonTasks = json.get("tasks").getAsJsonArray();
@@ -86,7 +81,7 @@ public class TasksControllerTest {
     public void getAllTasksInvalidStatusTest() throws ValidationException {
         String status = "someStatus";
         ResponseEntity<String> answer = tasksController.getTasksWithPagination(status, "desc", 1, 1);
-        verifyZeroInteractions(tasksRepository);
+        verifyZeroInteractions(tasksService);
         assertEquals(HttpStatus.BAD_REQUEST, answer.getStatusCode());
     }
 
@@ -94,9 +89,9 @@ public class TasksControllerTest {
     public void getByIdTest() throws NotFoundException, ValidationException {
         String id = UUID.randomUUID().toString();
         Task mockTask = mock(Task.class);
-        when(tasksRepository.getById(anyString())).thenReturn(mockTask);
+        when(tasksService.getById(anyString())).thenReturn(mockTask);
         ResponseEntity answer = tasksController.getByID(id);
-        verify(tasksRepository, times(1)).getById(id);
+        verify(tasksService, times(1)).getById(id);
         assertEquals(HttpStatus.OK, answer.getStatusCode());
         assertSame(mockTask, answer.getBody());
     }
@@ -104,9 +99,9 @@ public class TasksControllerTest {
     @Test (expected = NotFoundException.class)
     public void getByIdNotFoundTest() throws NotFoundException, ValidationException {
         String id = UUID.randomUUID().toString();
-        when(tasksRepository.getById(anyString())).thenReturn(null);
+        when(tasksService.getById(anyString())).thenReturn(null);
         ResponseEntity answer = tasksController.getByID(id);
-        verify(tasksRepository, times(1)).getById(id);
+        verify(tasksService, times(1)).getById(id);
         assertEquals(HttpStatus.NOT_FOUND, answer.getStatusCode());
     }
 
@@ -115,7 +110,7 @@ public class TasksControllerTest {
         String id = "unknown id";
         Task mockTask = mock(Task.class);
         ResponseEntity answer = tasksController.getByID(id);
-        verifyZeroInteractions(tasksRepository);
+        verifyZeroInteractions(tasksService);
         assertEquals(HttpStatus.BAD_REQUEST, answer.getStatusCode());
     }
 
@@ -127,9 +122,9 @@ public class TasksControllerTest {
         String status = "done";
 
         PatchTaskRequest request = new PatchTaskRequest(text, status);
-        when(tasksRepository.getById(anyString())).thenReturn(mockTask);
+        when(tasksService.getById(anyString())).thenReturn(mockTask);
         ResponseEntity answer = tasksController.update(id, request);
-        verify(tasksRepository, times(1)).update(any(Task.class));
+        verify(tasksService, times(1)).update(any(Task.class));
         assertEquals(HttpStatus.NO_CONTENT, answer.getStatusCode());
     }
 
@@ -140,9 +135,9 @@ public class TasksControllerTest {
         String status = "done";
 
         PatchTaskRequest request = new PatchTaskRequest(text, status);
-        when(tasksRepository.getById(anyString())).thenReturn(null);
+        when(tasksService.getById(anyString())).thenReturn(null);
         ResponseEntity answer = tasksController.update(id, request);
-        verifyNoMoreInteractions(tasksRepository);
+        verifyNoMoreInteractions(tasksService);
         assertEquals(HttpStatus.NOT_FOUND, answer.getStatusCode());
     }
 
@@ -151,18 +146,18 @@ public class TasksControllerTest {
         String id = UUID.randomUUID().toString();
         Task mockTask = mock(Task.class);
 
-        when(tasksRepository.getById(anyString())).thenReturn(mockTask);
+        when(tasksService.getById(anyString())).thenReturn(mockTask);
         ResponseEntity answer = tasksController.delete(id);
-        verify(tasksRepository, times(1)).delete(id);
+        verify(tasksService, times(1)).delete(id);
         assertEquals(HttpStatus.OK, answer.getStatusCode());
     }
 
     @Test (expected = NotFoundException.class)
     public void deleteNotFoundTest() throws NotFoundException, ValidationException {
         String id = UUID.randomUUID().toString();
-        when(tasksRepository.getById(anyString())).thenReturn(null);
+        when(tasksService.getById(anyString())).thenReturn(null);
         ResponseEntity answer = tasksController.delete(id);
-        verifyNoMoreInteractions(tasksRepository);
+        verifyNoMoreInteractions(tasksService);
         assertEquals(HttpStatus.NOT_FOUND, answer.getStatusCode());
     }
 
@@ -170,7 +165,7 @@ public class TasksControllerTest {
     public void deleteInvalidIdTest() throws NotFoundException, ValidationException {
         String id = "unknownID";
         ResponseEntity answer = tasksController.delete(id);
-        verifyNoMoreInteractions(tasksRepository);
+        verifyNoMoreInteractions(tasksService);
         assertEquals(HttpStatus.BAD_REQUEST, answer.getStatusCode());
     }
 
@@ -178,9 +173,9 @@ public class TasksControllerTest {
     public void createTest() {
         String text = "Do homework";
         Task mockTask = mock(Task.class);
-        when(tasksRepository.create(anyString())).thenReturn(mockTask);
+        when(tasksService.create(anyString())).thenReturn(mockTask);
         ResponseEntity answer = tasksController.create(new AddTaskRequest(text));
-        verify(tasksRepository, times(1)).create(text);
+        verify(tasksService, times(1)).create(text);
         assertEquals(HttpStatus.CREATED, answer.getStatusCode());
     }
 }
