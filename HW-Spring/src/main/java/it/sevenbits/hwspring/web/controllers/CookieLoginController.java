@@ -35,7 +35,7 @@ public class CookieLoginController {
 
         Cookie cookie = new Cookie("accessToken", token);
         cookie.setHttpOnly(true);
-        cookie.setMaxAge((int)(tokenService.getTokenExpiredIn().toMillis() / 1000));
+        cookie.setMaxAge((int) (tokenService.getTokenExpiredIn().toMillis() / 1000));
         response.addCookie(cookie);
 
         return ResponseEntity.noContent().build();
