@@ -37,7 +37,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         RequestMatcher loginPageMatcher = new AntPathRequestMatcher("/login");
         RequestMatcher notLoginPageMatcher = new NegatedRequestMatcher(loginPageMatcher);
 
-        JwtAuthFilter authFilter = new HeaderJwtAuthFilter(notLoginPageMatcher);
+//        JwtAuthFilter authFilter = new HeaderJwtAuthFilter(notLoginPageMatcher);
+        JwtAuthFilter authFilter = new CookieJwtAuthFilter(notLoginPageMatcher);
         http.addFilterBefore(authFilter, FilterSecurityInterceptor.class);
 
         http
@@ -62,6 +63,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public JwtTokenService jwtTokenService(final JwtSettings settings) {
         return new JsonWebTokenService(settings);
     }
-
-
 }

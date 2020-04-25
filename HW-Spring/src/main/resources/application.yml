@@ -18,5 +18,3 @@ jwt:
 logging:
   level:
     root: INFO
-      it.sevenbits.hwspring.web.security.JsonWebTokenService: DEBUG
-      it.sevenbits.hwspring.web.security.JwtAuthenticationProvider: DEBUG
