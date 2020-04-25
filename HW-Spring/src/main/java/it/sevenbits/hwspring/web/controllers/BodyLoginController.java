@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * Performs login action.
  */
-@RequestMapping("/login")
+@RequestMapping("/signin")
 public class BodyLoginController {
 
     private final LoginService loginService;

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Performs login action.
  */
-@RequestMapping("/login")
+@RequestMapping("/signin")
 public class CookieLoginController {
 
     private final LoginService loginService;

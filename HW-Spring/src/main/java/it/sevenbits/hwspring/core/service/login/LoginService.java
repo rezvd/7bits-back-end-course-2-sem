@@ -19,10 +19,10 @@ public class LoginService {
     }
 
     public User login(Login login) {
-        User user = users.findByUserName(login.getLogin());
+        User user = users.findByUserName(login.getUsername());
 
         if (user == null) {
-            throw new LoginFailedException("User '" + login.getLogin() + "' not found");
+            throw new LoginFailedException("User '" + login.getUsername() + "' not found");
         }
 
         if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {

@@ -34,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.requestCache().disable();
         http.anonymous();
 
-        RequestMatcher loginPageMatcher = new AntPathRequestMatcher("/login");
+        RequestMatcher loginPageMatcher = new AntPathRequestMatcher("/signin");
         RequestMatcher notLoginPageMatcher = new NegatedRequestMatcher(loginPageMatcher);
 
 //        JwtAuthFilter authFilter = new HeaderJwtAuthFilter(notLoginPageMatcher);
@@ -42,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(authFilter, FilterSecurityInterceptor.class);
 
         http
-                .authorizeRequests().antMatchers("/login").permitAll()
+                .authorizeRequests().antMatchers("/signin").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/users/**").hasAuthority("ADMIN")
                 .and()
