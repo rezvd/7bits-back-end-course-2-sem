@@ -10,6 +10,7 @@ public class StatusConstraintValidator implements ConstraintValidator<StatusCons
 
     /**
      * Initialization of validator
+     *
      * @param constraintAnnotation is status constraint
      */
     @Override
@@ -18,7 +19,8 @@ public class StatusConstraintValidator implements ConstraintValidator<StatusCons
 
     /**
      * Validates status constraint
-     * @param s is status, which should be checked
+     *
+     * @param s                          is status, which should be checked
      * @param constraintValidatorContext is context
      * @return true, if the status is valid, otherwise return false
      */

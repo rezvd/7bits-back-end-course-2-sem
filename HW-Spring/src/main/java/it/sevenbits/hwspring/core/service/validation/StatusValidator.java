@@ -7,16 +7,18 @@ import java.util.List;
  * Class for status validation
  */
 public final class StatusValidator {
-    private static List<String> statuses = new ArrayList<>();
+    private static final List<String> statuses = new ArrayList<>();
 
 
     /**
      * Constructor, which will never be called. Utility class should not have public or default constructor
      */
-    private StatusValidator(){}
+    private StatusValidator() {
+    }
 
     /**
      * Validates status
+     *
      * @param status is the status, which will be checked
      * @return true, if the status is valid, otherwise return false
      */

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import javax.validation.Valid;
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -43,8 +44,9 @@ public class TasksController {
 
     /**
      * Constructor for TasksController
+     *
      * @param tasksService is the service for work with repository
-     * @param pagination is the pagination to give tasks with right page, page size and order
+     * @param pagination   is the pagination to give tasks with right page, page size and order
      */
     public TasksController(final TasksService tasksService, final Pagination pagination) {
         service = tasksService;
@@ -53,9 +55,10 @@ public class TasksController {
 
     /**
      * Method to give all needed tasks in the right order
-     * @param status is the status to select tasks. If not specified default value will be used (inbox)
-     * @param order is the order to sort tasks. If not specified default value will be used (from pagination)
-     * @param page is the current page. If not specified or incorrect default value will be used (from pagination)
+     *
+     * @param status   is the status to select tasks. If not specified default value will be used (inbox)
+     * @param order    is the order to sort tasks. If not specified default value will be used (from pagination)
+     * @param page     is the current page. If not specified or incorrect default value will be used (from pagination)
      * @param pageSize is the current page size. If not specified or incorrect default value will be used (from pagination)
      * @return response entity with json string and status code OK (200).
      * If status or order is not valid status code will be bad request (400)
@@ -136,9 +139,10 @@ public class TasksController {
 
     /**
      * Handle GET request to certain task
+     *
      * @param id is id of needed task
      * @return task with this id, if it exists
-     * @throws NotFoundException if task with such id doesn't exist
+     * @throws NotFoundException   if task with such id doesn't exist
      * @throws ValidationException if id is not valid
      */
     @RequestMapping(value = "/{id}",
@@ -158,10 +162,11 @@ public class TasksController {
 
     /**
      * Handle PATCH request to certain task
-     * @param id is id of needed task
+     *
+     * @param id               is id of needed task
      * @param patchTaskRequest is model, which contains information to update task
      * @return http status
-     * @throws NotFoundException if task with such id doesn't exist
+     * @throws NotFoundException   if task with such id doesn't exist
      * @throws ValidationException if id is not valid or status specified, but not valid
      */
     @RequestMapping(value = "/{id}",
@@ -194,9 +199,10 @@ public class TasksController {
 
     /**
      * Handle DELETE request for a certain task
+     *
      * @param id is id of needed task
      * @return http status
-     * @throws NotFoundException if task with such id doesn't exist
+     * @throws NotFoundException   if task with such id doesn't exist
      * @throws ValidationException if id is not valid
      */
     @RequestMapping(value = "/{id}",
@@ -216,6 +222,7 @@ public class TasksController {
 
     /**
      * Handle POST request
+     *
      * @param taskRequest is model, which contains information to create task
      * @return created task
      */

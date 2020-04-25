@@ -9,10 +9,11 @@ import javax.validation.constraints.NotBlank;
  */
 public class AddTaskRequest {
     @NotBlank
-    private String text;
+    private final String text;
 
     /**
      * Constructor for AddTaskRequest
+     *
      * @param text is the text of future task. Can be obtained from json
      */
     public AddTaskRequest(@JsonProperty("text") final String text) {
@@ -21,6 +22,7 @@ public class AddTaskRequest {
 
     /**
      * Getter for text of the future task
+     *
      * @return text of task
      */
     public String getText() {

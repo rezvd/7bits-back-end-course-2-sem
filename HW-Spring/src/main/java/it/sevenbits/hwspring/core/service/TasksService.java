@@ -1,7 +1,7 @@
 package it.sevenbits.hwspring.core.service;
 
 import it.sevenbits.hwspring.core.model.Task;
-import it.sevenbits.hwspring.core.repository.ITasksRepository;
+import it.sevenbits.hwspring.core.repository.tasks.ITasksRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -17,6 +17,7 @@ public class TasksService {
 
     /**
      * Constructor for TasksService
+     *
      * @param tasksRepository is the repository for tasks
      */
     public TasksService(final ITasksRepository tasksRepository) {
@@ -25,6 +26,7 @@ public class TasksService {
 
     /**
      * Method to get number of the tasks with some status
+     *
      * @param status is a status to filter tasks
      * @return number of tasks with such status
      */
@@ -34,7 +36,8 @@ public class TasksService {
 
     /**
      * Calculates number of the pages
-     * @param status is a param to filter tasks
+     *
+     * @param status   is a param to filter tasks
      * @param pageSize is number of tasks on one page
      * @return number of pages with certain size, filled with tasks by certain status.
      * If there is no tasks, the pages number is 1
@@ -50,9 +53,10 @@ public class TasksService {
 
     /**
      * Builds URI link to the next page
-     * @param status is a status of the tasks
-     * @param order is an order to sort tasks
-     * @param page is a current page
+     *
+     * @param status   is a status of the tasks
+     * @param order    is an order to sort tasks
+     * @param page     is a current page
      * @param pageSize is number of tasks on one page
      * @return URI from "/tasks" with these parameters as a query, which leads to the next page
      */
@@ -67,9 +71,10 @@ public class TasksService {
 
     /**
      * Builds URI link to the previous page
-     * @param status is a status of the tasks
-     * @param order is an order to sort tasks
-     * @param page is a current page
+     *
+     * @param status   is a status of the tasks
+     * @param order    is an order to sort tasks
+     * @param page     is a current page
      * @param pageSize is number of tasks on one page
      * @return URI from "/tasks" with these parameters as a query, which leads to the previous page
      */
@@ -84,26 +89,28 @@ public class TasksService {
 
     /**
      * Builds URI link to the first page
-     * @param status is a status of the tasks
-     * @param order is an order to sort tasks
+     *
+     * @param status   is a status of the tasks
+     * @param order    is an order to sort tasks
      * @param pageSize is number of tasks on one page
      * @return URI from "/tasks" with these parameters as a query, which leads to the first page
      */
     public static URI getFirstPage(final String status, final String order, final int pageSize) {
         return UriComponentsBuilder.fromPath("/tasks")
-                        .queryParam("status", status)
-                        .queryParam("order", order)
-                        .queryParam("page", 1)
-                        .queryParam("size", pageSize)
-                        .build().toUri();
+                .queryParam("status", status)
+                .queryParam("order", order)
+                .queryParam("page", 1)
+                .queryParam("size", pageSize)
+                .build().toUri();
     }
 
     /**
      * Builds URI link to the last page
-     * @param status is a status of the tasks
-     * @param order is an order to sort tasks
+     *
+     * @param status      is a status of the tasks
+     * @param order       is an order to sort tasks
      * @param pagesNumber is a number of pages with such status and size
-     * @param pageSize is number of tasks on one page
+     * @param pageSize    is number of tasks on one page
      * @return URI from "/tasks" with these parameters as a query, which leads to the last page
      */
     public static URI getLastPage(final String status, final String order, final int pagesNumber, final int pageSize) {
@@ -117,9 +124,10 @@ public class TasksService {
 
     /**
      * Creates list of task for this page
-     * @param status is a status of the tasks
-     * @param order is an order to sort tasks
-     * @param page is current page
+     *
+     * @param status   is a status of the tasks
+     * @param order    is an order to sort tasks
+     * @param page     is current page
      * @param pageSize is number of tasks on one page
      * @return list of tasks with certain status in the certain order, which place on the certain page
      */
@@ -129,6 +137,7 @@ public class TasksService {
 
     /**
      * Search task with this id
+     *
      * @param id is the id of needed task
      * @return found task or null, if there is no task with such id
      */
@@ -138,6 +147,7 @@ public class TasksService {
 
     /**
      * Changes existing task with parameters of newTask
+     *
      * @param newTask is the task, which id will be used to find existing task and
      *                which other params will be used to update current task
      */
@@ -147,6 +157,7 @@ public class TasksService {
 
     /**
      * Deletes tasks with this id
+     *
      * @param id is id of task, which will be deleted
      */
     public void delete(final String id) {
@@ -155,6 +166,7 @@ public class TasksService {
 
     /**
      * Creates task with selected text
+     *
      * @param text is the text of future task
      * @return created task
      */

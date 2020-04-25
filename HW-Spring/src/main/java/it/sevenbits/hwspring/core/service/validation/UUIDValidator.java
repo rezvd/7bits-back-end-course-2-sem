@@ -11,10 +11,12 @@ public final class UUIDValidator {
     /**
      * Constructor, which will never be called. Utility class should not have public or default constructor
      */
-    private UUIDValidator(){}
+    private UUIDValidator() {
+    }
 
     /**
      * Validates UUID string
+     *
      * @param s is the string, which will be checked as UUID
      * @return true, if the string if valid, otherwise return false
      */

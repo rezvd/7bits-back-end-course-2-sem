@@ -1,7 +1,7 @@
 package it.sevenbits.hwspring.core.service;
 
 import it.sevenbits.hwspring.core.model.Task;
-import it.sevenbits.hwspring.core.repository.ITasksRepository;
+import it.sevenbits.hwspring.core.repository.tasks.ITasksRepository;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,8 +13,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

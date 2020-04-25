@@ -20,6 +20,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     /**
      * Handle NotFoundException
+     *
      * @param e is an appeared exception
      * @return ResponseEntity with http status code 404 (not found)
      */
@@ -30,6 +31,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     /**
      * Handle ValidationException
+     *
      * @param e is an appeared exception
      * @return ResponseEntity with http status code 400 (bad request)
      */
@@ -40,29 +42,33 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     /**
      * Handle HttpMessageNotReadableException
-     * @param ex is an appeared exception
+     *
+     * @param ex      is an appeared exception
      * @param headers the headers to be written to the response
-     * @param status the selected response status
+     * @param status  the selected response status
      * @param request the current request
      * @return ResponseEntity with http status code 400 (bad request)
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex, final
-        HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+    HttpHeaders headers, final HttpStatus status, final WebRequest request) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     /**
      * Handle MethodArgumentNotValidException
-     * @param ex is an appeared exception
+     *
+     * @param ex      is an appeared exception
      * @param headers the headers to be written to the response
-     * @param status the selected response status
+     * @param status  the selected response status
      * @param request the current request
      * @return ResponseEntity with http status code 400 (bad request)
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
-         final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+                                                                  final HttpHeaders headers,
+                                                                  final HttpStatus status,
+                                                                  final WebRequest request) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

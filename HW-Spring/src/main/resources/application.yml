@@ -6,6 +6,17 @@ spring:
   datasource:
     tasks:
       jdbc-url: jdbc:postgresql://localhost:5432/eisetasks
-      username: myuser
-      password: pass
+      username: defaultuser
+      password: userpassword
       driver-class-name: org.postgresql.Driver
+
+jwt:
+  issuer: 'rezv.daria@gmail.com'
+  signingKey: 'TALSPOC120NXJSAPQKE1D77'
+  aTokenDuration: 30
+
+logging:
+  level:
+    root: INFO
+      it.sevenbits.hwspring.web.security.JsonWebTokenService: DEBUG
+      it.sevenbits.hwspring.web.security.JwtAuthenticationProvider: DEBUG

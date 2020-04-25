@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import javax.sql.DataSource;
 
 /**
@@ -18,6 +19,7 @@ public class TasksDatabaseConfig {
 
     /**
      * Creates DataSource for connections to database
+     *
      * @return ready DataSource
      */
     @Bean
@@ -30,6 +32,7 @@ public class TasksDatabaseConfig {
 
     /**
      * Creates JDBC operations
+     *
      * @param tasksDataSource is DataSource for connection to database
      * @return ready JdbcTemplate for work with database
      */

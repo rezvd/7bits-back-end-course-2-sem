@@ -17,16 +17,17 @@ public class Task {
     @NotBlank
     private final String text;
     @StatusConstraint
-    private String status;
+    private final String status;
     @NotBlank
-    private Date createdAt;
-    private Date updatedAt;
+    private final Date createdAt;
+    private final Date updatedAt;
 
     /**
      * Constructor for task. Task can be created from json
-     * @param id is unique identifier of this task
-     * @param text is text of this task
-     * @param status is status of this task
+     *
+     * @param id        is unique identifier of this task
+     * @param text      is text of this task
+     * @param status    is status of this task
      * @param createdAt is the date and time, when this task was created
      * @param updatedAt is the date and time, when this task was updated
      */

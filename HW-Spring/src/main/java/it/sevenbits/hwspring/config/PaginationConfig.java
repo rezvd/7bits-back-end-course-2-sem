@@ -17,6 +17,7 @@ public class PaginationConfig {
 
     /**
      * Set configuration for pagination: minimum, maximum and default page size, default order of sorting
+     *
      * @return ready pagination
      */
     @Bean

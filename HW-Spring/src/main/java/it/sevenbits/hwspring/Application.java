@@ -11,6 +11,7 @@ public class Application {
 
     /**
      * Start of an application
+     *
      * @param args can contain config or input data
      */
     public static void main(final String[] args) {

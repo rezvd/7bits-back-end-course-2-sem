@@ -1,4 +1,4 @@
-package it.sevenbits.hwspring.core.repository;
+package it.sevenbits.hwspring.core.repository.tasks;
 
 import it.sevenbits.hwspring.core.model.Task;
 
@@ -11,9 +11,10 @@ public interface ITasksRepository {
 
     /**
      * Function for getting all tasks with certain status and pagination
-     * @param status is for selection tasks
-     * @param order is he order to sort task. Can have values "desc" or "asc"
-     * @param page is the number of current page. Starts with 1
+     *
+     * @param status   is for selection tasks
+     * @param order    is he order to sort task. Can have values "desc" or "asc"
+     * @param page     is the number of current page. Starts with 1
      * @param pageSize is the size of the page
      * @return list of tasks on current page with certain status in certain order.
      * Size of the list cannot be greater then pageSize
@@ -22,6 +23,7 @@ public interface ITasksRepository {
 
     /**
      * Created new Task with selected text. Other parameters of task will be set by default
+     *
      * @param text is the text of future task
      * @return created task with selected text
      */
@@ -29,6 +31,7 @@ public interface ITasksRepository {
 
     /**
      * Search task with this id through repository
+     *
      * @param id is the id of needed task
      * @return found task or null, if there is no task with such id
      */
@@ -37,6 +40,7 @@ public interface ITasksRepository {
     /**
      * Changes existing task with text and status of newTask.
      * Field updatedAt is also will be changes according to the current time
+     *
      * @param newTask is the task, which id will be used to find existing task and
      *                which text and status will be used to update current task
      */
@@ -44,12 +48,14 @@ public interface ITasksRepository {
 
     /**
      * Deletes tasks with this id
+     *
      * @param id is id of task, which will be deleted
      */
     void delete(String id);
 
     /**
      * Calculate number of tasks with certain status
+     *
      * @param status is the status to select task
      * @return number of tasks with this status
      */

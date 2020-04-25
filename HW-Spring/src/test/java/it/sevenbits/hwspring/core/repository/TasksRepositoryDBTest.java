@@ -1,6 +1,7 @@
 package it.sevenbits.hwspring.core.repository;
 
 import it.sevenbits.hwspring.core.model.Task;
+import it.sevenbits.hwspring.core.repository.tasks.TasksRepositoryDB;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -6,12 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Model for updating task
  */
 public class PatchTaskRequest {
-    private String text;
-    private String status;
+    private final String text;
+    private final String status;
 
     /**
      * Constructor for PatchTaskRequest
-     * @param text is a new text of task. Can be obtained from json
+     *
+     * @param text   is a new text of task. Can be obtained from json
      * @param status is a new status of task. Can be obtained from json
      */
     public PatchTaskRequest(@JsonProperty("text") final String text, @JsonProperty("status") final String status) {
@@ -21,6 +22,7 @@ public class PatchTaskRequest {
 
     /**
      * Getter for new text of the task
+     *
      * @return new text of task
      */
     public String getText() {
@@ -29,6 +31,7 @@ public class PatchTaskRequest {
 
     /**
      * Getter for new status of the task
+     *
      * @return new status of task
      */
     public String getStatus() {

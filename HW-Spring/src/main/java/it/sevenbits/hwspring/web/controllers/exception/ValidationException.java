@@ -14,6 +14,7 @@ public class ValidationException extends Exception {
 
     /**
      * Constructor with message
+     *
      * @param message contains information about exception
      */
     public ValidationException(final String message) {
@@ -22,6 +23,7 @@ public class ValidationException extends Exception {
 
     /**
      * Constructor with cause of an exception
+     *
      * @param throwable is a cause of an exception
      */
     public ValidationException(final Throwable throwable) {
@@ -30,7 +32,8 @@ public class ValidationException extends Exception {
 
     /**
      * Constructor with message and cause of an exception
-     * @param message contains information about exception
+     *
+     * @param message   contains information about exception
      * @param throwable is a cause of an exception
      */
     public ValidationException(final String message, final Throwable throwable) {

@@ -7,16 +7,18 @@ import java.util.List;
  * Class for order validation
  */
 public final class OrderValidator {
-    private static List<String> orders = new ArrayList<>();
+    private static final List<String> orders = new ArrayList<>();
 
 
     /**
      * Constructor, which will never be called. Utility class should not have public or default constructor
      */
-    private OrderValidator(){}
+    private OrderValidator() {
+    }
 
     /**
      * Validates order
+     *
      * @param order is the order, which will be checked
      * @return true, if the order is valid, otherwise return false
      */
