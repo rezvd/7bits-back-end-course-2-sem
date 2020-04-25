@@ -3,16 +3,19 @@ package it.sevenbits.hwspring.web.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * Model to receive username and password.
  */
-public class Login {
+public class SignUp {
 
     private final String username;
+    @NotBlank
     private final String password;
 
     @JsonCreator
-    public Login(@JsonProperty("username") String username, @JsonProperty("password") String password) {
+    public SignUp(@JsonProperty("username") String username, @JsonProperty("password") String password) {
         this.username = username;
         this.password = password;
     }

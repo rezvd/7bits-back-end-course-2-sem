@@ -1,13 +1,14 @@
 package it.sevenbits.hwspring.core.repository.users;
 
+import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.model.User;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static java.lang.Boolean.TRUE;
 
 /**
  * Repository to list all users.
@@ -68,6 +69,19 @@ public class DatabaseUsersRepository implements UsersRepository {
         }
 
         return new ArrayList<>(users.values());
+    }
+
+    @Override
+    public User create(String username, String password, List<String> authorities) {
+        jdbcOperations.update(
+                "INSERT INTO users (username, password, enabled) VALUES (?, ?, ?)",
+                username, password, TRUE
+        );
+        jdbcOperations.update(
+                "INSERT INTO authorities (username, authority) VALUES (?, ?)",
+                username, "USER"
+        );
+        return new User(username, password, authorities);
     }
 
 }

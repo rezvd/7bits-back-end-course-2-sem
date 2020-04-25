@@ -1,8 +1,10 @@
 package it.sevenbits.hwspring.web.controllers;
 
 import it.sevenbits.hwspring.core.model.User;
-import it.sevenbits.hwspring.core.service.login.LoginService;
-import it.sevenbits.hwspring.web.model.Login;
+import it.sevenbits.hwspring.core.service.signin.SignInService;
+import it.sevenbits.hwspring.core.service.signup.SignUpService;
+import it.sevenbits.hwspring.web.model.SignIn;
+import it.sevenbits.hwspring.web.model.SignUp;
 import it.sevenbits.hwspring.web.security.JwtTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,23 +16,23 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Performs login action.
+ * Performs sign up action.
  */
-@RequestMapping("/signin")
-public class CookieLoginController {
+@RequestMapping("/signup")
+public class CookieSignUpController {
 
-    private final LoginService loginService;
+    private final SignUpService signUpService;
     private final JwtTokenService tokenService;
 
-    public CookieLoginController(final LoginService loginService, final JwtTokenService tokenService) {
-        this.loginService = loginService;
+    public CookieSignUpController(final SignUpService signUpService, final JwtTokenService tokenService) {
+        this.signUpService = signUpService;
         this.tokenService = tokenService;
     }
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity create(@RequestBody Login login, HttpServletResponse response) {
-        User user = loginService.login(login);
+    public ResponseEntity create(@RequestBody SignUp signUp, HttpServletResponse response) {
+        User user = signUpService.signUp(signUp);
         String token = tokenService.createToken(user);
 
         Cookie cookie = new Cookie("accessToken", token);

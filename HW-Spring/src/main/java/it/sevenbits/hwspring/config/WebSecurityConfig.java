@@ -10,9 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.util.matcher.*;
 
 @Configuration
 @EnableWebSecurity
@@ -34,14 +32,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.requestCache().disable();
         http.anonymous();
 
-        RequestMatcher loginPageMatcher = new AntPathRequestMatcher("/signin");
-        RequestMatcher notLoginPageMatcher = new NegatedRequestMatcher(loginPageMatcher);
+        RequestMatcher signinPageMatcher = new AntPathRequestMatcher("/signin");
+        RequestMatcher signupPageMatcher = new AntPathRequestMatcher("/signup");
+        RequestMatcher signinAndSignup = new OrRequestMatcher(signinPageMatcher, signupPageMatcher);
+        RequestMatcher notLoginPageMatcher = new NegatedRequestMatcher(signinAndSignup);
 
 //        JwtAuthFilter authFilter = new HeaderJwtAuthFilter(notLoginPageMatcher);
         JwtAuthFilter authFilter = new CookieJwtAuthFilter(notLoginPageMatcher);
         http.addFilterBefore(authFilter, FilterSecurityInterceptor.class);
 
         http
+                .authorizeRequests().antMatchers("/signup").permitAll()
+                .and()
                 .authorizeRequests().antMatchers("/signin").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/users/**").hasAuthority("ADMIN")
