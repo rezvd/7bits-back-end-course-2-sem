@@ -28,7 +28,7 @@ public class SignInService {
         if (!passwordEncoder.matches(signIn.getPassword(), user.getPassword())) {
             throw new SignInFailedException("Wrong password");
         }
-        return new User(user.getUsername(), user.getAuthorities());
+        return user;
     }
 
 }

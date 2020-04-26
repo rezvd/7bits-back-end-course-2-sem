@@ -1,11 +1,12 @@
 create table users (
-  username VARCHAR(256) PRIMARY KEY,
-  password VARCHAR(256),
+  id character(36) PRIMARY KEY,
+  username VARCHAR(256) NOT NULL,
+  password VARCHAR(256) NOT NULL,
   enabled boolean
 );
 
 create table authorities (
-  username  VARCHAR(256) REFERENCES users(username) ON DELETE CASCADE,
-  authority VARCHAR(256),
-  PRIMARY KEY (username, authority)
+  user_id  VARCHAR(256) REFERENCES users(id) ON DELETE CASCADE,
+  authority VARCHAR(256) NOT NULL,
+  PRIMARY KEY (user_id, authority)
 );

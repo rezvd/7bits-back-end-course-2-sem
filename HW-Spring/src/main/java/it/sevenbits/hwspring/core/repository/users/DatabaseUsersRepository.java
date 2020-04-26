@@ -2,6 +2,7 @@ package it.sevenbits.hwspring.core.repository.users;
 
 import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.model.User;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 
@@ -16,6 +17,7 @@ import static java.lang.Boolean.TRUE;
 public class DatabaseUsersRepository implements UsersRepository {
     private final JdbcOperations jdbcOperations;
     private final String AUTHORITY = "authority";
+    private final String ID = "id";
     private final String USERNAME = "username";
     private final String PASSWORD = "password";
 
@@ -28,7 +30,7 @@ public class DatabaseUsersRepository implements UsersRepository {
 
         try {
             rawUser = jdbcOperations.queryForMap(
-                    "SELECT username, password FROM users u" +
+                    "SELECT id, username, password FROM users u" +
                             " WHERE u.enabled = true AND u.username = ?",
                     username
             );
@@ -36,39 +38,68 @@ public class DatabaseUsersRepository implements UsersRepository {
             return null;
         }
 
+        String id = String.valueOf(rawUser.get(ID));
+
         List<String> authorities = new ArrayList<>();
         jdbcOperations.query(
-                "SELECT username, authority FROM authorities" +
-                        " WHERE username = ?",
+                "SELECT user_id, authority FROM authorities" +
+                        " WHERE user_id = ?",
                 resultSet -> {
                     String authority = resultSet.getString(AUTHORITY);
                     authorities.add(authority);
                 },
-                username
+                id
         );
 
         String password = String.valueOf(rawUser.get(PASSWORD));
-        return new User(username, password, authorities);
+        return new User(id, username, password, authorities);
+    }
+
+
+    public User findByID(String id) {
+        Map<String, Object> rawUser;
+
+        try {
+            rawUser = jdbcOperations.queryForMap(
+                    "SELECT id, username, password FROM users u" +
+                            " WHERE u.enabled = true AND u.id = ?",
+                    id
+            );
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return null;
+        }
+
+        List<String> authorities = new ArrayList<>();
+        jdbcOperations.query(
+                "SELECT user_id, authority FROM authorities" +
+                        " WHERE user_id = ?",
+                resultSet -> {
+                    String authority = resultSet.getString(AUTHORITY);
+                    authorities.add(authority);
+                },
+                id
+        );
+
+        String username = String.valueOf(rawUser.get(USERNAME));
+        String password = String.valueOf(rawUser.get(PASSWORD));
+        return new User(id, username, password, authorities);
+
     }
 
     public List<User> findAll() {
-        HashMap<String, User> users = new HashMap<>();
-
+        ArrayList<User> users = new ArrayList<>();
         for (Map<String, Object> row : jdbcOperations.queryForList(
-                "SELECT username, authority FROM authorities a" +
-                        " WHERE EXISTS" +
-                        " (SELECT * FROM users u WHERE" +
-                        " u.username = a.username AND u.enabled = true)")) {
-
+                "(SELECT * FROM users u WHERE u.enabled = true)")) {
             String username = String.valueOf(row.get(USERNAME));
-            String newRole = String.valueOf(row.get(AUTHORITY));
-            User user = users.computeIfAbsent(username, name -> new User(name, new ArrayList<>()));
-            List<String> roles = user.getAuthorities();
-            roles.add(newRole);
-
+            String id = String.valueOf(row.get(ID));
+            String password = String.valueOf(row.get(PASSWORD));
+            List<String> auths = jdbcOperations.queryForList("(SELECT authority FROM  authorities" +
+                                                                    " WHERE user_id = ?)",
+                    String.class,
+                    id);
+            users.add(new User(id, username, password, auths));
         }
-
-        return new ArrayList<>(users.values());
+        return users;
     }
 
     @Override

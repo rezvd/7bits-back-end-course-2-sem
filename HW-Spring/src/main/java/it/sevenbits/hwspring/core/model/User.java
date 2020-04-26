@@ -12,6 +12,9 @@ import java.util.List;
 
 public class User {
 
+    @JsonProperty("id")
+    private final String id;
+
     @JsonProperty("username")
     private final String username;
 
@@ -21,33 +24,19 @@ public class User {
     @JsonIgnore
     private final String password;
 
-    public User(String username, String password, List<String> authorities) {
+    public User(String id, String username, String password, List<String> authorities) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
     }
 
     @JsonCreator
-    public User( String username,  List<String> authorities) {
+    public User(String id, String username,  List<String> authorities) {
+        this.id = id;
         this.username = username;
         this.password = null;
         this.authorities = authorities;
-    }
-
-    public User(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        password = null;
-
-        authorities = new ArrayList<>();
-        for (GrantedAuthority authority : authentication.getAuthorities()) {
-            authorities.add(authority.getAuthority());
-        }
     }
 
     public String getUsername() {
@@ -60,5 +49,9 @@ public class User {
 
     public List<String> getAuthorities() {
         return authorities;
+    }
+
+    public String getId() {
+        return id;
     }
 }
