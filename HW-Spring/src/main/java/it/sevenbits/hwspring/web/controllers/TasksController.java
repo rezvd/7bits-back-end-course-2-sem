@@ -15,12 +15,10 @@ import it.sevenbits.hwspring.web.controllers.exception.ValidationException;
 import it.sevenbits.hwspring.web.model.tasks.AddTaskRequest;
 import it.sevenbits.hwspring.web.model.tasks.Pagination;
 import it.sevenbits.hwspring.web.model.tasks.PatchTaskRequest;
+import it.sevenbits.hwspring.web.service.WhoamiService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,17 +40,21 @@ import java.util.TimeZone;
 @RequestMapping("/tasks")
 public class TasksController {
     private final Pagination pagination;
-    private final TasksService service;
+    private final TasksService tasksService;
+    private final WhoamiService whoamiService;
 
     /**
      * Constructor for TasksController
      *
      * @param tasksService is the service for work with repository
+     * @param whoamiService is the service for identify current user
      * @param pagination   is the pagination to give tasks with right page, page size and order
      */
-    public TasksController(final TasksService tasksService, final Pagination pagination) {
-        service = tasksService;
+    public TasksController(final TasksService tasksService, final WhoamiService whoamiService,
+                           final Pagination pagination) {
+        this.tasksService = tasksService;
         this.pagination = pagination;
+        this.whoamiService = whoamiService;
     }
 
     /**
@@ -103,8 +105,8 @@ public class TasksController {
                     return new JsonPrimitive(dateFormat.format(date));
                 })
                 .create();
-        int count = service.getTasksNumber(status);
-        int pageN = service.getPagesNumber(status, actualPageSize);
+        int count = tasksService.getTasksNumber(status);
+        int pageN = tasksService.getPagesNumber(status, actualPageSize);
 
         if (page == null || page < 1 || page > pageN) {
             actualPage = pagination.getDefaultPage();
@@ -134,7 +136,7 @@ public class TasksController {
 
         rootObject.add("_meta", childObject);
         rootObject.add("tasks", gson.toJsonTree(
-                service.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize, getCurrentUser())));
+                tasksService.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize, getCurrentUserId())));
 
         return new ResponseEntity<>(rootObject.toString(), HttpStatus.OK);
     }
@@ -155,11 +157,11 @@ public class TasksController {
         if (!UUIDValidator.isValid(id)) {
             throw new ValidationException(String.format("ID \"%s\" is not valid", id));
         }
-        Task task = service.getById(id);
+        Task task = tasksService.getById(id);
         if (task == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
         }
-        if (!service.getOwner(task.getId()).equals(getCurrentUser())) {
+        if (!tasksService.getOwner(task.getId()).equals(getCurrentUserId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(task, HttpStatus.OK);
@@ -185,7 +187,7 @@ public class TasksController {
         if (!UUIDValidator.isValid(id)) {
             throw new ValidationException(String.format("ID \"%s\" is not valid", id));
         }
-        Task previousTask = service.getById(id);
+        Task previousTask = tasksService.getById(id);
         if (previousTask == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
         }
@@ -201,7 +203,7 @@ public class TasksController {
         } else if (!StatusValidator.isValid(patchTaskRequest.getStatus())) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        service.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date()));
+        tasksService.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date()));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -221,10 +223,10 @@ public class TasksController {
         if (!UUIDValidator.isValid(id)) {
             throw new ValidationException(String.format("ID \"%s\" is not valid", id));
         }
-        if (service.getById(id) == null) {
+        if (tasksService.getById(id) == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
         }
-        service.delete(id);
+        tasksService.delete(id);
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -239,22 +241,14 @@ public class TasksController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity create(@RequestBody @Valid final AddTaskRequest taskRequest) {
-        Task task = service.create(taskRequest.getText(), getCurrentUser());
+        Task task = tasksService.create(taskRequest.getText(), getCurrentUserId());
         URI location = UriComponentsBuilder.fromPath("/tasks/")
                 .path(task.getId())
                 .build().toUri();
         return ResponseEntity.created(location).body(task);
     }
 
-    private String getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        String ownerId;
-        if (principal instanceof UserDetails) {
-            ownerId = ((UserDetails) principal).getUsername();
-        } else {
-            ownerId = principal.toString();
-        }
-        return ownerId;
+    private String getCurrentUserId() {
+        return whoamiService.getUserFromContext().getId();
     }
 }

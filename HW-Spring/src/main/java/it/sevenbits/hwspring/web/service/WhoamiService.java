@@ -3,6 +3,7 @@ package it.sevenbits.hwspring.web.service;
 import it.sevenbits.hwspring.core.model.User;
 import it.sevenbits.hwspring.core.repository.users.UsersRepository;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,11 @@ public class WhoamiService {
     }
 
     /**
-     * Extract information about current user from Authentication
-     * @param authentication contains information about current user
+     * Extract information about current user from SecurityContextHolder
      * @return current user
      */
-    public User getUserFromAuth(final Authentication authentication) {
+    public User getUserFromContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
         String id = "";
         if (principal instanceof UserDetails) {

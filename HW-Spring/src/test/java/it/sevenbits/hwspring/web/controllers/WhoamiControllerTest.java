@@ -1,14 +1,17 @@
 package it.sevenbits.hwspring.web.controllers;
 
-import it.sevenbits.hwspring.core.service.TasksService;
-import it.sevenbits.hwspring.web.model.tasks.Pagination;
+import it.sevenbits.hwspring.core.model.User;
 import it.sevenbits.hwspring.web.service.WhoamiService;
-import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
-import static org.mockito.Mockito.mock;
-
-public class WhoamiControllerTest extends TestCase {
+public class WhoamiControllerTest {
     private WhoamiController whoamiController;
     private WhoamiService whoamiService;
 
@@ -18,6 +21,13 @@ public class WhoamiControllerTest extends TestCase {
         whoamiController = new WhoamiController(whoamiService);
     }
 
+    @Test
     public void testGet() {
+        User user = mock(User.class);
+        when(whoamiService.getUserFromContext()).thenReturn(user);
+        ResponseEntity response = whoamiController.get();
+        verify(whoamiService, times(1)).getUserFromContext();
+        Assert.assertSame(user, response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 }
