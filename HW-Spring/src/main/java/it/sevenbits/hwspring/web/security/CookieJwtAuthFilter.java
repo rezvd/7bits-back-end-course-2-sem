@@ -12,12 +12,16 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class CookieJwtAuthFilter extends JwtAuthFilter {
 
-    public CookieJwtAuthFilter(RequestMatcher matcher) {
+    /**
+     * Constructor for CookieJwtAuthFilter
+     * @param matcher for filtering requests
+     */
+    public CookieJwtAuthFilter(final RequestMatcher matcher) {
         super(matcher);
     }
 
     @Override
-    protected String takeToken(HttpServletRequest request) throws AuthenticationException {
+    protected String takeToken(final HttpServletRequest request) throws AuthenticationException {
         Cookie cookie = WebUtils.getCookie(request, "accessToken");
         if (cookie != null) {
             return cookie.getValue();

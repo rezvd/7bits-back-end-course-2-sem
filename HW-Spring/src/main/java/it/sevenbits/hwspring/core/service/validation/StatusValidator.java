@@ -7,7 +7,7 @@ import java.util.List;
  * Class for status validation
  */
 public final class StatusValidator {
-    private static final List<String> statuses = new ArrayList<>();
+    private static final List<String> STATUSES = new ArrayList<>();
 
 
     /**
@@ -23,8 +23,8 @@ public final class StatusValidator {
      * @return true, if the status is valid, otherwise return false
      */
     public static boolean isValid(final String status) {
-        statuses.add("inbox");
-        statuses.add("done");
-        return statuses.contains(status);
+        STATUSES.add("inbox");
+        STATUSES.add("done");
+        return STATUSES.contains(status);
     }
 }

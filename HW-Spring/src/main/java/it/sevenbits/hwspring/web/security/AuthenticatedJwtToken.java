@@ -12,6 +12,11 @@ class AuthenticatedJwtToken extends AbstractAuthenticationToken {
 
     private final String subject;
 
+    /**
+     * Constructor for AuthenticatedJwtToken
+     * @param subject is ID of authenticated user
+     * @param authorities is list of user's roles
+     */
     AuthenticatedJwtToken(final String subject, final Collection<GrantedAuthority> authorities) {
         super(authorities);
         this.subject = subject;

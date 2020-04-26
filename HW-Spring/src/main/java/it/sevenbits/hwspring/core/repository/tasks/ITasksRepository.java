@@ -16,6 +16,7 @@ public interface ITasksRepository {
      * @param order    is he order to sort task. Can have values "desc" or "asc"
      * @param page     is the number of current page. Starts with 1
      * @param pageSize is the size of the page
+     * @param owner    is the ID of user whose task are needed
      * @return list of tasks on current page with certain status in certain order.
      * Size of the list cannot be greater then pageSize
      */
@@ -25,6 +26,7 @@ public interface ITasksRepository {
      * Created new Task with selected text. Other parameters of task will be set by default
      *
      * @param text is the text of future task
+     * @param owner is an ID of user who owns this task
      * @return created task with selected text
      */
     Task create(String text, String owner);
@@ -61,5 +63,10 @@ public interface ITasksRepository {
      */
     int count(String status);
 
+    /**
+     * Find a task by id and return its owner
+     * @param id is an ID of the task
+     * @return ID of user which own this task
+     */
     String getOwner(String id);
 }

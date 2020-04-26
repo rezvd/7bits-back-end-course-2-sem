@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 /**
- * Authentication provider which is able to verify JWT tokens.
+ * Authentication provider which is able to verify JWT tokens
  */
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
@@ -15,12 +15,16 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private final JwtTokenService tokenService;
 
+    /**
+     * Constructor for JwtAuthenticationProvider
+     * @param tokenService is a service for work with token
+     */
     public JwtAuthenticationProvider(final JwtTokenService tokenService) {
         this.tokenService = tokenService;
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         String token = String.valueOf(authentication.getCredentials());
         logger.debug("Authenticating {}", token);
 
@@ -32,7 +36,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     }
 
     @Override
-    public boolean supports(Class<?> authentication) {
+    public boolean supports(final Class<?> authentication) {
         return (JwtToken.class.isAssignableFrom(authentication));
     }
 

@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 public class RepositoryConfig {
 
     /**
-     * Set certain implementation of repository
+     * Set certain implementation of tasks repository
      *
      * @param jdbcOperations sets basic JDBC operations
      * @return ready instance of tasks repository
@@ -27,6 +27,12 @@ public class RepositoryConfig {
     }
 
 
+    /**
+     * Set certain implementation of users repository
+     *
+     * @param jdbcOperations sets basic JDBC operations
+     * @return ready instance of users repository
+     */
     @Bean
     public UsersRepository usersRepository(final @Qualifier("tasksJdbcOperations") JdbcOperations jdbcOperations) {
         return new UsersRepositoryDB(jdbcOperations);

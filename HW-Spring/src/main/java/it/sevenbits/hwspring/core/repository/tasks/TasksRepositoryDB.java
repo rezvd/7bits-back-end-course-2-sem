@@ -71,7 +71,7 @@ public class TasksRepositoryDB implements ITasksRepository {
     public Task getById(final String id) {
         try {
             return jdbcOperations.queryForObject(
-                    "SELECT id, text, status, createdAt, updatedAt, owner FROM task WHERE id = ?",
+                    "SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?",
                     (resultSet, i) -> buildTask(resultSet),
                     id);
         } catch (EmptyResultDataAccessException e) {

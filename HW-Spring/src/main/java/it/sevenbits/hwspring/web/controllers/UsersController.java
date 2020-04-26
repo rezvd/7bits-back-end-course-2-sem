@@ -15,25 +15,34 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Controller to list users.
+ * Controller for work with /users
  */
 @Controller
 @RequestMapping("/users")
-
 public class UsersController {
 
     private final UsersRepository usersRepository;
 
-    public UsersController(UsersRepository usersRepository) {
+    /**
+     * Construction for UsersController
+     * @param usersRepository is a repository which keep all information about users
+     */
+    public UsersController(final UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(usersRepository.findAll());
+        return ResponseEntity.ok(usersRepository.findAllUsers());
     }
 
+    /**
+     * Perform information about certain user
+     * @param id is an ID of user
+     * @return ResponseEntity with user information
+     * @throws ValidationException if user id is not UUID
+     */
     @GetMapping(value = "/{id}")
     @ResponseBody
     public ResponseEntity<User> getUserInfo(final @PathVariable("id") String id) throws ValidationException {

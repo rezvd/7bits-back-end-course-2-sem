@@ -1,4 +1,4 @@
-package it.sevenbits.hwspring.core.repository;
+package it.sevenbits.hwspring.core.repository.tasks;
 
 import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.repository.tasks.TasksRepositoryDB;
@@ -8,8 +8,10 @@ import org.junit.Test;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -25,6 +27,15 @@ public class TasksRepositoryDBTest {
     private JdbcOperations mockJdbc;
     private TasksRepositoryDB tasksRepository;
 
+    String status = "inbox";
+    String text = "Do homework";
+    String order = "DESC";
+    String owner = "owner";
+    int page = 1;
+    int pageSize = 25;
+    int count = 1;
+
+
 
     @Before
     public void setup() {
@@ -34,21 +45,18 @@ public class TasksRepositoryDBTest {
 
     @Test
     public void getAllTasksTest() {
-        String status = "inbox";
-        int page = 1;
-        int pageSize = 25;
-        String order = "DESC";
         List<Task> mockTasks = mock(List.class);
 
-        when(mockJdbc.query(anyString(), any(RowMapper.class), anyString(), anyInt(), anyInt())).thenReturn(mockTasks);
+        when(mockJdbc.query(anyString(), any(RowMapper.class), anyString(), anyString(), anyInt(), anyInt())).thenReturn(mockTasks);
 
-        List<Task> actualList = tasksRepository.getTasksWithPagination(status, order, page, pageSize);
+        List<Task> actualList = tasksRepository.getTasksWithPagination(status, order, page, pageSize, owner);
 
         verify(mockJdbc, times(1)).query(
-                eq(String.format("SELECT id, text, status, createdAt, updatedAt FROM task "
-                        + "WHERE status = ? ORDER BY createdAt %s OFFSET ? LIMIT ?", order)),
+                eq(String.format("SELECT id, text, status, createdAt, updatedAt, owner FROM task "
+                        + "WHERE status = ? and owner = ? ORDER BY createdAt %s OFFSET ? LIMIT ?", order)),
                 any(RowMapper.class),
                 eq(status),
+                eq(owner),
                 eq((page - 1) * pageSize),
                 eq(pageSize)
         );
@@ -77,8 +85,6 @@ public class TasksRepositoryDBTest {
     @Test
     public void updateTest() {
         String id = UUID.randomUUID().toString();
-        String status = "inbox";
-        String text = "Do homework";
         Date date = new Date();
 
         tasksRepository.update(new Task(id, text, status, null, date));
@@ -106,9 +112,6 @@ public class TasksRepositoryDBTest {
 
     @Test
     public void countTest() {
-        String status = "inbox";
-        int count = 1;
-
         when(mockJdbc.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(count);
 
         int actual = tasksRepository.count(status);
@@ -119,6 +122,15 @@ public class TasksRepositoryDBTest {
         );
 
         Assert.assertSame(count, actual);
+    }
+
+
+    @Test
+    public void createTest() {
+        Task actual = tasksRepository.create(text, owner);
+        Assert.assertEquals(actual.getText(), text);
+        Assert.assertEquals(actual.getStatus(), status);
+        Assert.assertEquals(actual.getCreatedAt(), actual.getUpdatedAt());
     }
 
 }

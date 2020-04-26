@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 /**
- * Settings to the JWT token.
+ * Settings to the JWT token
  */
 @Component
 public class JwtSettings {
@@ -16,6 +16,12 @@ public class JwtSettings {
     private final String tokenSigningKey;
     private final int aTokenDuration;
 
+    /**
+     * Constructor for JwtSettings
+     * @param tokenIssuer is an issuer to sign token
+     * @param tokenSigningKey is a key to sign token
+     * @param aTokenDuration is a time within token is alive
+     */
     public JwtSettings(@Value("${jwt.issuer}") final String tokenIssuer,
                        @Value("${jwt.signingKey}") final String tokenSigningKey,
                        @Value("${jwt.aTokenDuration}") final int aTokenDuration) {

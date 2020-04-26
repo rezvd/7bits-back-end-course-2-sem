@@ -7,9 +7,9 @@ import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.service.TasksService;
 import it.sevenbits.hwspring.web.controllers.exception.NotFoundException;
 import it.sevenbits.hwspring.web.controllers.exception.ValidationException;
-import it.sevenbits.hwspring.web.model.AddTaskRequest;
-import it.sevenbits.hwspring.web.model.Pagination;
-import it.sevenbits.hwspring.web.model.PatchTaskRequest;
+import it.sevenbits.hwspring.web.model.tasks.AddTaskRequest;
+import it.sevenbits.hwspring.web.model.tasks.Pagination;
+import it.sevenbits.hwspring.web.model.tasks.PatchTaskRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -21,9 +21,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -47,14 +45,15 @@ public class TasksControllerTest {
         int page = 1;
         int pageSize = 25;
         String order = "desc";
+        String owner = "taskowner";
         List<Task> tasks = new ArrayList<>();
         Date date = new Date();
         tasks.add(new Task(UUID.randomUUID().toString(), "Do homework", status, date, date));
-        when(tasksService.getTasksWithPagination(anyString(), anyString(), anyInt(), anyInt())).thenReturn(tasks);
+        when(tasksService.getTasksWithPagination(anyString(), anyString(), anyInt(), anyInt(), eq(null))).thenReturn(tasks);
         when(tasksService.getTasksNumber(anyString())).thenReturn(tasks.size());
         when(tasksService.getPagesNumber(anyString(), anyInt())).thenReturn(1);
         ResponseEntity<String> answer = tasksController.getTasksWithPagination(status, order, page, pageSize);
-        verify(tasksService, times(1)).getTasksWithPagination(status, order, page, pageSize);
+        verify(tasksService, times(1)).getTasksWithPagination(status, order, page, pageSize, owner);
         assertEquals(HttpStatus.OK, answer.getStatusCode());
 
         Gson gson = new Gson();
@@ -172,10 +171,12 @@ public class TasksControllerTest {
     @Test
     public void createTest() {
         String text = "Do homework";
+        String owner = "taskowner";
         Task mockTask = mock(Task.class);
-        when(tasksService.create(anyString())).thenReturn(mockTask);
+        when(tasksService.create(anyString(), anyString())).thenReturn(mockTask);
         ResponseEntity answer = tasksController.create(new AddTaskRequest(text));
-        verify(tasksService, times(1)).create(text);
+        verify(tasksService, times(1)).create(text, owner);
         assertEquals(HttpStatus.CREATED, answer.getStatusCode());
     }
+
 }

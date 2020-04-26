@@ -1,4 +1,4 @@
-package it.sevenbits.hwspring.core.service;
+package it.sevenbits.hwspring.web.service;
 
 import it.sevenbits.hwspring.core.model.User;
 import it.sevenbits.hwspring.core.repository.users.UsersRepository;
@@ -11,11 +11,20 @@ public class WhoamiService {
 
     private final UsersRepository users;
 
-    public WhoamiService(UsersRepository users) {
+    /**
+     * Constructor for WhoamiService
+     * @param users is a user repository
+     */
+    public WhoamiService(final UsersRepository users) {
         this.users = users;
     }
 
-    public User getUserFromAuth(Authentication authentication) {
+    /**
+     * Extract information about current user from Authentication
+     * @param authentication contains information about current user
+     * @return current user
+     */
+    public User getUserFromAuth(final Authentication authentication) {
         Object principal = authentication.getPrincipal();
         String id = "";
         if (principal instanceof UserDetails) {

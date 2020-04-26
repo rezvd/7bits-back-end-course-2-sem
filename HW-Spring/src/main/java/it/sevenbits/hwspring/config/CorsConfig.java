@@ -17,21 +17,26 @@ public class CorsConfig {
     private String allowOrigins;
 
     @Value("${corsHeaders.allowCredentials:true}")
-    private boolean allowCredentials = true;
+    private final boolean  allowCredentials = true;
 
     @Value("${corsHeaders.allowMethods:GET,POST,OPTIONS}")
     private String allowMethods;
 
-    @Value("${corsHeaders.allowHeaders:Authorization,Origin,Accept,Key,DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type}")
+    @Value("${corsHeaders.allowHeaders:Authorization,Origin,Accept,Key,DNT,Keep-Alive,User-Agent,X-Requested-With," +
+            "If-Modified-Since,Cache-Control,Content-Type}")
     private String allowHeaders;
 
-    private Pattern delimiter = Pattern.compile("[,\\s]+");
+    private final Pattern delimiter = Pattern.compile("[,\\s]+");
 
+    /**
+     * Allows preflight requests
+     * @return configures WebMvcConfigurer
+     */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(final CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(delimiter.split(allowOrigins))
                         .allowCredentials(allowCredentials)

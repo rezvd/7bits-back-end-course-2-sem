@@ -1,7 +1,7 @@
 package it.sevenbits.hwspring.web.controllers.auth;
 
 import it.sevenbits.hwspring.core.model.User;
-import it.sevenbits.hwspring.core.service.signup.SignUpService;
+import it.sevenbits.hwspring.web.service.signup.SignUpService;
 import it.sevenbits.hwspring.web.model.auth.SignUp;
 import it.sevenbits.hwspring.web.security.JwtTokenService;
 import org.springframework.http.ResponseEntity;
@@ -22,20 +22,32 @@ public class CookieSignUpController {
     private final SignUpService signUpService;
     private final JwtTokenService tokenService;
 
+    /**
+     * Constructor for CookieSignUpController
+     * @param signUpService is a service which provides sign up
+     * @param tokenService is a service for work with token
+     */
     public CookieSignUpController(final SignUpService signUpService, final JwtTokenService tokenService) {
         this.signUpService = signUpService;
         this.tokenService = tokenService;
     }
 
+    /**
+     * Creates token with user information
+     * @param signUp contains user information needed to sign up
+     * @param response is a response to the request
+     * @return token with user information
+     */
     @PostMapping
     @ResponseBody
-    public ResponseEntity create(@RequestBody SignUp signUp, HttpServletResponse response) {
+    public ResponseEntity create(final @RequestBody SignUp signUp, final HttpServletResponse response) {
         User user = signUpService.signUp(signUp);
         String token = tokenService.createToken(user);
+        final int millis = 1000;
 
         Cookie cookie = new Cookie("accessToken", token);
         cookie.setHttpOnly(true);
-        cookie.setMaxAge((int) (tokenService.getTokenExpiredIn().toMillis() / 1000));
+        cookie.setMaxAge((int) (tokenService.getTokenExpiredIn().toMillis() / millis));
         response.addCookie(cookie);
 
         return ResponseEntity.noContent().build();

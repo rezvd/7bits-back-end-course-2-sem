@@ -3,12 +3,16 @@ package it.sevenbits.hwspring.web.security;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 /**
- * Authorization which holds unparsed and unverified JWT token.
+ * Authorization which holds unparsed and unverified JWT token
  */
 public class JwtToken extends AbstractAuthenticationToken {
 
     private final String token;
 
+    /**
+     * Conctructor for JwtToken
+     * @param token is token in string type
+     */
     public JwtToken(final String token) {
         super(null);
         this.token = token;
@@ -16,7 +20,7 @@ public class JwtToken extends AbstractAuthenticationToken {
     }
 
     @Override
-    public void setAuthenticated(boolean authenticated) {
+    public void setAuthenticated(final boolean authenticated) {
         if (authenticated) {
             throw new IllegalArgumentException(
                     "Cannot set this token to trusted");

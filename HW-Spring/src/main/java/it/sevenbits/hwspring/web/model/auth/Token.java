@@ -10,8 +10,12 @@ public class Token {
 
     private final String token;
 
+    /**
+     * JSON constructor for Token
+     * @param token is a token in string type
+     */
     @JsonCreator
-    public Token(@JsonProperty("token") String token) {
+    public Token(final @JsonProperty("token") String token) {
         this.token = token;
     }
 

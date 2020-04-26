@@ -1,6 +1,11 @@
 package it.sevenbits.hwspring.config;
 
-import it.sevenbits.hwspring.web.security.*;
+import it.sevenbits.hwspring.web.security.CookieJwtAuthFilter;
+import it.sevenbits.hwspring.web.security.JsonWebTokenService;
+import it.sevenbits.hwspring.web.security.JwtAuthFilter;
+import it.sevenbits.hwspring.web.security.JwtAuthenticationProvider;
+import it.sevenbits.hwspring.web.security.JwtSettings;
+import it.sevenbits.hwspring.web.security.JwtTokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,21 +15,28 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.security.web.util.matcher.*;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private JwtTokenService jwtTokenService;
+    private final JwtTokenService jwtTokenService;
 
+    /**
+     * Constructor for WebSecurityConfig
+     * @param jwtTokenService is a service for work with JWT token
+     */
     public WebSecurityConfig(final JwtTokenService jwtTokenService) {
         this.jwtTokenService = jwtTokenService;
     }
 
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.formLogin().disable();
         http.logout().disable();
@@ -52,15 +64,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    public void configure(final AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(new JwtAuthenticationProvider(jwtTokenService));
     }
 
+    /**
+     * Encoder for encoding passwords
+     * @return certain implementation of PasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configures a JwtTokenService
+     * @param settings contains settings for JwtTokenService
+     * @return a service for work with JWT token
+     */
     @Bean
     public JwtTokenService jwtTokenService(final JwtSettings settings) {
         return new JsonWebTokenService(settings);

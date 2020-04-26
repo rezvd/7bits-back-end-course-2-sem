@@ -1,14 +1,12 @@
 package it.sevenbits.hwspring.core.repository.users;
 
-import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.model.User;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import static java.lang.Boolean.TRUE;
 
 /**
@@ -16,16 +14,25 @@ import static java.lang.Boolean.TRUE;
  */
 public class UsersRepositoryDB implements UsersRepository {
     private final JdbcOperations jdbcOperations;
-    private final String AUTHORITY = "authority";
-    private final String ID = "id";
-    private final String USERNAME = "username";
-    private final String PASSWORD = "password";
+    private static final String AUTHORITY = "authority";
+    private static final String ID = "id";
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
 
+    /**
+     * Conctructor for UsersRepositoryDB
+     * @param jdbcOperations provides work with DB
+     */
     public UsersRepositoryDB(final JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
     }
 
-    public User findByUserName(String username) {
+    /**
+     * Searches user in repository by username
+     * @param username is a username, chosen by user
+     * @return User, if user with such username exists, otherwise null
+     */
+    public User findByUserName(final String username) {
         Map<String, Object> rawUser;
 
         try {
@@ -55,8 +62,12 @@ public class UsersRepositoryDB implements UsersRepository {
         return new User(id, username, password, authorities);
     }
 
-
-    public User findByID(String id) {
+    /**
+     * Searches user in repository by ID
+     * @param id is an ID of user
+     * @return User, if user with such ID exists, otherwise null
+     */
+    public User findByID(final String id) {
         Map<String, Object> rawUser;
 
         try {
@@ -86,14 +97,18 @@ public class UsersRepositoryDB implements UsersRepository {
 
     }
 
-    public List<User> findAll() {
+    /**
+     * Make a list with all users in the repository
+     * @return list with all users
+     */
+    public List<User> findAllUsers() {
         ArrayList<User> users = new ArrayList<>();
         for (Map<String, Object> row : jdbcOperations.queryForList(
                 "(SELECT * FROM users u WHERE u.enabled = true)")) {
             String username = String.valueOf(row.get(USERNAME));
             String id = String.valueOf(row.get(ID));
             String password = String.valueOf(row.get(PASSWORD));
-            List<String> auths = jdbcOperations.queryForList("(SELECT authority FROM  authorities" +
+            List<String> auths = jdbcOperations.queryForList("(SELECT authority FROM authorities" +
                                                                     " WHERE user_id = ?)",
                     String.class,
                     id);
@@ -103,8 +118,15 @@ public class UsersRepositoryDB implements UsersRepository {
     }
 
 
+    /**
+     * Puts new user to the repository
+     * @param username is a username, chosen by user
+     * @param password is a password of User
+     * @param authorities is a list of user's roles
+     * @return created user
+     */
     @Override
-    public User create(String username, String password, List<String> authorities) {
+    public User create(final String username, final String password, final List<String> authorities) {
         String id = getNextID();
         jdbcOperations.update(
                 "INSERT INTO users (id, username, password, enabled) VALUES (?, ?, ?, ?)",
@@ -121,9 +143,8 @@ public class UsersRepositoryDB implements UsersRepository {
 
 
     /**
-     * Generates new id
-     *
-     * @return new random id
+     * Generates new UUID
+     * @return new random UUID
      */
     private String getNextID() {
         return UUID.randomUUID().toString();

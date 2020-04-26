@@ -22,5 +22,4 @@ public class TaskTest {
         Assert.assertEquals(current, task.getCreatedAt());
         Assert.assertNull(task.getUpdatedAt());
     }
-
 }

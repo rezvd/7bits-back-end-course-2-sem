@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import javax.validation.Valid;
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -97,6 +96,14 @@ public class TasksController {
             actualPageSize = pageSize;
         }
 
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    return new JsonPrimitive(dateFormat.format(date));
+                })
+                .create();
+        int count = service.getTasksNumber(status);
         int pageN = service.getPagesNumber(status, actualPageSize);
 
         if (page == null || page < 1 || page > pageN) {
@@ -105,7 +112,29 @@ public class TasksController {
             actualPage = page;
         }
 
-        JsonObject rootObject = service.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize, getCurrentUser());
+        JsonObject rootObject = new JsonObject();
+        JsonObject childObject = new JsonObject();
+        childObject.addProperty("total", count);
+        childObject.addProperty("page", actualPage);
+        childObject.addProperty("size", actualPageSize);
+        if (actualPage < pageN) {
+            childObject.addProperty("next",
+                    TasksService.getNextPage(status, actualOrder, actualPage, actualPageSize).toString());
+        }
+        if (actualPage > 1) {
+            childObject.addProperty("prev",
+                    TasksService.getPrevPage(status, actualOrder, actualPage, actualPageSize).toString());
+        }
+
+        childObject.addProperty("first",
+                TasksService.getFirstPage(status, actualOrder, actualPageSize).toString());
+
+        childObject.addProperty("last",
+                TasksService.getLastPage(status, actualOrder, pageN, actualPageSize).toString());
+
+        rootObject.add("_meta", childObject);
+        rootObject.add("tasks", gson.toJsonTree(
+                service.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize, getCurrentUser())));
 
         return new ResponseEntity<>(rootObject.toString(), HttpStatus.OK);
     }
@@ -220,12 +249,12 @@ public class TasksController {
     private String getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
-        String owner_id = "";
+        String ownerId;
         if (principal instanceof UserDetails) {
-            owner_id = ((UserDetails) principal).getUsername();
+            ownerId = ((UserDetails) principal).getUsername();
         } else {
-            owner_id = principal.toString();
+            ownerId = principal.toString();
         }
-        return owner_id;
+        return ownerId;
     }
 }

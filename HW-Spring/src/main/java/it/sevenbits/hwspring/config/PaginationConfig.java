@@ -12,9 +12,13 @@ import org.springframework.context.annotation.Configuration;
 public class PaginationConfig {
 
     /**
-     * Set configuration for pagination: minimum, maximum and default page size, default order of sorting
-     *
-     * @return ready pagination
+     * Set configuration for pagination according to the values in the Application.yml
+     * @param minPageSize is a minimum page size
+     * @param maxPageSize is a maximum page size
+     * @param defaultPageSize is a default page size
+     * @param defaultPage is a default page
+     * @param defaultOrder is a default order of sorting tasks
+     * @return configured pagination
      */
     @Bean
     public Pagination pagination(@Value("${pagination.min-page-size}") final int minPageSize,

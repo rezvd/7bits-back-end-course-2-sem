@@ -1,4 +1,4 @@
-package it.sevenbits.hwspring.core.service.signup;
+package it.sevenbits.hwspring.web.service.signup;
 
 import it.sevenbits.hwspring.core.model.User;
 import it.sevenbits.hwspring.core.repository.users.UsersRepository;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Service
 public class SignUpService {
 
@@ -20,12 +19,22 @@ public class SignUpService {
     private final UsersRepository users;
     private final PasswordEncoder passwordEncoder;
 
-    public SignUpService(UsersRepository users, PasswordEncoder passwordEncoder) {
+    /**
+     * Constructor for SignUpService
+     * @param users is a user repository
+     * @param passwordEncoder is an encoder for encoding passwords
+     */
+    public SignUpService(final UsersRepository users, final PasswordEncoder passwordEncoder) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User signUp(SignUp signUp) {
+    /**
+     * Performs signing up
+     * @param signUp contains information about user needed to sign up
+     * @return created user
+     */
+    public User signUp(final SignUp signUp) {
         if (signUp.getPassword().isEmpty()) {
             throw new SignUpFailedException("Empty password");
         }
@@ -38,9 +47,7 @@ public class SignUpService {
 
         List<String> authorities = new ArrayList<>();
         authorities.add("USER");
-        user = users.create(signUp.getUsername(), signUp.getPassword(), authorities);
-
-
+        user = users.create(signUp.getUsername(), passwordEncoder.encode(signUp.getPassword()), authorities);
         return user;
     }
 

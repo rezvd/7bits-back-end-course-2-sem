@@ -7,7 +7,7 @@ import java.util.List;
  * Class for order validation
  */
 public final class OrderValidator {
-    private static final List<String> orders = new ArrayList<>();
+    private static final List<String> ORDERS = new ArrayList<>();
 
 
     /**
@@ -23,8 +23,8 @@ public final class OrderValidator {
      * @return true, if the order is valid, otherwise return false
      */
     public static boolean isValid(final String order) {
-        orders.add("desc");
-        orders.add("asc");
-        return orders.contains(order);
+        ORDERS.add("desc");
+        ORDERS.add("asc");
+        return ORDERS.contains(order);
     }
 }

@@ -1,4 +1,4 @@
-package it.sevenbits.hwspring.core.service.signin;
+package it.sevenbits.hwspring.web.service.signin;
 
 import it.sevenbits.hwspring.core.model.User;
 import it.sevenbits.hwspring.core.repository.users.UsersRepository;
@@ -13,12 +13,22 @@ public class SignInService {
     private final UsersRepository users;
     private final PasswordEncoder passwordEncoder;
 
-    public SignInService(UsersRepository users, PasswordEncoder passwordEncoder) {
+    /**
+     * Constructor for SignInService
+     * @param users is a user repository
+     * @param passwordEncoder is an encoder for encoding passwords
+     */
+    public SignInService(final UsersRepository users, final PasswordEncoder passwordEncoder) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User signIn(SignIn signIn) {
+    /**
+     * Performs signing in
+     * @param signIn contains information about user needed to sign in
+     * @return authenticated user
+     */
+    public User signIn(final SignIn signIn) {
         User user = users.findByUserName(signIn.getUsername());
 
         if (user == null) {
