@@ -66,9 +66,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
-                                                                  final HttpHeaders headers,
-                                                                  final HttpStatus status,
-                                                                  final WebRequest request) {
+                                                                  final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
