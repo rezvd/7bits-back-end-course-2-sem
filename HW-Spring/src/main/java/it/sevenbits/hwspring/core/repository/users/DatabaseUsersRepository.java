@@ -102,17 +102,31 @@ public class DatabaseUsersRepository implements UsersRepository {
         return users;
     }
 
+
     @Override
     public User create(String username, String password, List<String> authorities) {
+        String id = getNextID();
         jdbcOperations.update(
-                "INSERT INTO users (username, password, enabled) VALUES (?, ?, ?)",
-                username, password, TRUE
+                "INSERT INTO users (id, username, password, enabled) VALUES (?, ?, ?, ?)",
+                id, username, password, TRUE
         );
-        jdbcOperations.update(
-                "INSERT INTO authorities (username, authority) VALUES (?, ?)",
-                username, "USER"
-        );
-        return new User(username, password, authorities);
+        for (String a: authorities) {
+            jdbcOperations.update(
+                    "INSERT INTO authorities (user_id, authority) VALUES (?, ?)",
+                    id, a
+            );
+        }
+        return new User(id, username, password, authorities);
+    }
+
+
+    /**
+     * Generates new id
+     *
+     * @return new random id
+     */
+    private String getNextID() {
+        return UUID.randomUUID().toString();
     }
 
 }
