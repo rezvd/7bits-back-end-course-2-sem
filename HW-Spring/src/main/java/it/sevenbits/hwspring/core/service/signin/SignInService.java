@@ -2,7 +2,7 @@ package it.sevenbits.hwspring.core.service.signin;
 
 import it.sevenbits.hwspring.core.model.User;
 import it.sevenbits.hwspring.core.repository.users.UsersRepository;
-import it.sevenbits.hwspring.web.model.SignIn;
+import it.sevenbits.hwspring.web.model.auth.SignIn;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

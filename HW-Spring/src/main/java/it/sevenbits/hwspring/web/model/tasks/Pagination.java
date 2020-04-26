@@ -1,4 +1,4 @@
-package it.sevenbits.hwspring.web.model;
+package it.sevenbits.hwspring.web.model.tasks;
 
 /**
  * Class, which help to get items with pagination

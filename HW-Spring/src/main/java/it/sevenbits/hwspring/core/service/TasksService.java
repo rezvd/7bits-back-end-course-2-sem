@@ -131,8 +131,12 @@ public class TasksService {
      * @param pageSize is number of tasks on one page
      * @return list of tasks with certain status in the certain order, which place on the certain page
      */
-    public List<Task> getTasksWithPagination(final String status, final String order, final int page, final int pageSize) {
-        return tasksRepository.getTasksWithPagination(status, order, page, pageSize);
+    public List<Task> getTasksWithPagination(final String status,
+                                             final String order,
+                                             final int page,
+                                             final int pageSize,
+                                             final String owner) {
+        return tasksRepository.getTasksWithPagination(status, order, page, pageSize, owner);
     }
 
     /**
@@ -170,7 +174,7 @@ public class TasksService {
      * @param text is the text of future task
      * @return created task
      */
-    public Task create(final String text) {
-        return tasksRepository.create(text);
+    public Task create(final String text, final String owner) {
+        return tasksRepository.create(text, owner);
     }
 }

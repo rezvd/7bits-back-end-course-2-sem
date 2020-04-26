@@ -12,12 +12,15 @@ import it.sevenbits.hwspring.core.service.validation.StatusValidator;
 import it.sevenbits.hwspring.core.service.validation.UUIDValidator;
 import it.sevenbits.hwspring.web.controllers.exception.NotFoundException;
 import it.sevenbits.hwspring.web.controllers.exception.ValidationException;
-import it.sevenbits.hwspring.web.model.AddTaskRequest;
-import it.sevenbits.hwspring.web.model.Pagination;
-import it.sevenbits.hwspring.web.model.PatchTaskRequest;
+import it.sevenbits.hwspring.web.model.tasks.AddTaskRequest;
+import it.sevenbits.hwspring.web.model.tasks.Pagination;
+import it.sevenbits.hwspring.web.model.tasks.PatchTaskRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -132,7 +135,7 @@ public class TasksController {
 
         rootObject.add("_meta", childObject);
         rootObject.add("tasks", gson.toJsonTree(
-                service.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize)));
+                service.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize, getCurrentUser())));
 
         return new ResponseEntity<>(rootObject.toString(), HttpStatus.OK);
     }
@@ -156,6 +159,9 @@ public class TasksController {
         Task task = service.getById(id);
         if (task == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
+        }
+        if (!task.getOwner().equals(getCurrentUser())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
@@ -185,6 +191,7 @@ public class TasksController {
         }
         String status = previousTask.getStatus();
         String text = previousTask.getText();
+        String owner = previousTask.getOwner();
         if (StatusValidator.isValid(patchTaskRequest.getStatus())) {
             status = patchTaskRequest.getStatus();
         } else if (!(patchTaskRequest.getStatus() == null || patchTaskRequest.getStatus().equals(""))) {
@@ -193,7 +200,7 @@ public class TasksController {
         if (!(patchTaskRequest.getText() == null || patchTaskRequest.getText().equals(""))) {
             text = patchTaskRequest.getText();
         }
-        service.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date()));
+        service.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date(), owner));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -231,10 +238,22 @@ public class TasksController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity create(@RequestBody @Valid final AddTaskRequest taskRequest) {
-        Task task = service.create(taskRequest.getText());
+        Task task = service.create(taskRequest.getText(), getCurrentUser());
         URI location = UriComponentsBuilder.fromPath("/tasks/")
                 .path(task.getId())
                 .build().toUri();
         return ResponseEntity.created(location).body(task);
+    }
+
+    private String getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        String owner_id = "";
+        if (principal instanceof UserDetails) {
+            owner_id = ((UserDetails) principal).getUsername();
+        } else {
+            owner_id = principal.toString();
+        }
+        return owner_id;
     }
 }

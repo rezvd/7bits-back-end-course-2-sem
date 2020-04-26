@@ -4,7 +4,6 @@ import it.sevenbits.hwspring.core.model.User;
 import it.sevenbits.hwspring.core.repository.users.UsersRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,12 +17,12 @@ public class WhoamiService {
 
     public User getUserFromAuth(Authentication authentication) {
         Object principal = authentication.getPrincipal();
-        String username = "";
+        String id = "";
         if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
+            id = ((UserDetails) principal).getUsername();
         } else {
-            username = principal.toString();
+            id = principal.toString();
         }
-        return users.findByUserName(username);
+        return users.findByID(id);
     }
 }

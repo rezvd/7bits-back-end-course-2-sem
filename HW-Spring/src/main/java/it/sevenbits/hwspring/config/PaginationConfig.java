@@ -1,6 +1,6 @@
 package it.sevenbits.hwspring.config;
 
-import it.sevenbits.hwspring.web.model.Pagination;
+import it.sevenbits.hwspring.web.model.tasks.Pagination;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

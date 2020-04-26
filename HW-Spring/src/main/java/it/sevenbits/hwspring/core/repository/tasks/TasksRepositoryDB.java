@@ -28,30 +28,36 @@ public class TasksRepositoryDB implements ITasksRepository {
     }
 
     @Override
-    public List<Task> getTasksWithPagination(final String status, final String order, final int page, final int pageSize) {
-        return jdbcOperations.query(String.format("SELECT id, text, status, createdAt, updatedAt FROM task "
-                        + "WHERE status = ? ORDER BY createdAt %s OFFSET ? LIMIT ?", order.toUpperCase()),
-                (resultSet, i) -> buildTask(resultSet), status, (page - 1) * pageSize, pageSize);
+    public List<Task> getTasksWithPagination(final String status,
+                                             final String order,
+                                             final int page,
+                                             final int pageSize,
+                                             final String owner) {
+        return jdbcOperations.query(String.format("SELECT id, text, status, createdAt, updatedAt, owner FROM task "
+                        + "WHERE status = ? and owner = ? ORDER BY createdAt %s OFFSET ? LIMIT ?",
+                order.toUpperCase()),
+                (resultSet, i) -> buildTask(resultSet),
+                status, owner, (page - 1) * pageSize, pageSize);
     }
 
     /**
-     * Creates task with selected text. Status is "inbox" by default. Id is provided by method getNextID.
+     * Creates task with selected text. Status is "inbox" by default. ID is provided by method getNextID.
      * Fields createdAt and updatedAt is set according to the current date and time
      *
      * @param text is the text of future task
      * @return created task
      */
     @Override
-    public Task create(final String text) {
+    public Task create(final String text, final String owner) {
         String id = getNextID();
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         jdbcOperations.update(
-                "INSERT INTO task (id, text, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)",
-                id, text, "inbox", date, date
+                "INSERT INTO task (id, text, status, createdAt, updatedAt, owner) VALUES (?, ?, ?, ?, ?, ?)",
+                id, text, "inbox", date, date, owner
         );
-        return new Task(id, text, "inbox", date, date);
+        return new Task(id, text, "inbox", date, date, owner);
     }
 
     /**
@@ -64,7 +70,7 @@ public class TasksRepositoryDB implements ITasksRepository {
     public Task getById(final String id) {
         try {
             return jdbcOperations.queryForObject(
-                    "SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?",
+                    "SELECT id, text, status, createdAt, updatedAt, owner FROM task WHERE id = ?",
                     (resultSet, i) -> buildTask(resultSet),
                     id);
         } catch (EmptyResultDataAccessException e) {
@@ -117,6 +123,7 @@ public class TasksRepositoryDB implements ITasksRepository {
         String currentStatus = resultSet.getString("status");
         Date createdAt = resultSet.getTimestamp("createdAt");
         Date updatedAt = resultSet.getTimestamp("updatedAt");
-        return new Task(id, name, currentStatus, createdAt, updatedAt);
+        String owner = resultSet.getString("owner");
+        return new Task(id, name, currentStatus, createdAt, updatedAt, owner);
     }
 }

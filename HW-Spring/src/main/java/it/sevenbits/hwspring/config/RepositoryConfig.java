@@ -23,19 +23,14 @@ public class RepositoryConfig {
      * @return ready instance of tasks repository
      */
     @Bean
-    public ITasksRepository tasksRepository(@Qualifier("tasksJdbcOperations") final JdbcOperations jdbcOperations) {
+    public ITasksRepository tasksRepository(final @Qualifier("tasksJdbcOperations") JdbcOperations jdbcOperations) {
         return new TasksRepositoryDB(jdbcOperations);
     }
 
 
-    /**
-     * The method creates instance of users repository
-     *
-     * @param jdbcTemplate instance of jdbcTemplate
-     * @return instance of the books repository
-     */
     @Bean
-    public UsersRepository usersRepository(final @Qualifier("tasksJdbcOperations") JdbcTemplate jdbcTemplate) {
-        return new DatabaseUsersRepository(jdbcTemplate);
+    public UsersRepository usersRepository(final @Qualifier("tasksJdbcOperations") JdbcOperations jdbcOperations) {
+        return new DatabaseUsersRepository(jdbcOperations);
     }
+
 }

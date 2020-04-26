@@ -1,4 +1,4 @@
-package it.sevenbits.hwspring.web.model;
+package it.sevenbits.hwspring.web.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

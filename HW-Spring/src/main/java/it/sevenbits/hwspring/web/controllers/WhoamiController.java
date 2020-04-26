@@ -1,9 +1,7 @@
 package it.sevenbits.hwspring.web.controllers;
 
 import it.sevenbits.hwspring.core.model.User;
-import it.sevenbits.hwspring.core.service.TasksService;
 import it.sevenbits.hwspring.core.service.WhoamiService;
-import it.sevenbits.hwspring.web.model.Pagination;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

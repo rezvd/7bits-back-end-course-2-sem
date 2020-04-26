@@ -15,7 +15,7 @@ import javax.sql.DataSource;
  * Set configuration for work with database
  */
 @Configuration
-public class TasksDatabaseConfig {
+public class DatabaseConfig {
 
     /**
      * Creates DataSource for connections to database

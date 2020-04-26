@@ -43,7 +43,7 @@ public class JsonWebTokenService implements JwtTokenService {
         Claims claims = Jwts.claims()
                 .setIssuer(settings.getTokenIssuer())
                 .setIssuedAt(Date.from(now))
-                .setSubject(user.getUsername())
+                .setSubject(user.getId()) // TODO
                 .setExpiration(Date.from(now.plus(settings.getTokenExpiredIn())));
         claims.put(AUTHORITIES, user.getAuthorities());
 

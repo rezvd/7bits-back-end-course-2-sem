@@ -1,4 +1,4 @@
-package it.sevenbits.hwspring.web.model;
+package it.sevenbits.hwspring.web.model.tasks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -2,8 +2,7 @@ package it.sevenbits.hwspring.core.service.signup;
 
 import it.sevenbits.hwspring.core.model.User;
 import it.sevenbits.hwspring.core.repository.users.UsersRepository;
-import it.sevenbits.hwspring.web.model.SignIn;
-import it.sevenbits.hwspring.web.model.SignUp;
+import it.sevenbits.hwspring.web.model.auth.SignUp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;

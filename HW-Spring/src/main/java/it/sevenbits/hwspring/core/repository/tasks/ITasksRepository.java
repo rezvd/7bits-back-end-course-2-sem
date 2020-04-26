@@ -19,7 +19,7 @@ public interface ITasksRepository {
      * @return list of tasks on current page with certain status in certain order.
      * Size of the list cannot be greater then pageSize
      */
-    List<Task> getTasksWithPagination(String status, String order, int page, int pageSize);
+    List<Task> getTasksWithPagination(String status, String order, int page, int pageSize, String owner);
 
     /**
      * Created new Task with selected text. Other parameters of task will be set by default
@@ -27,7 +27,7 @@ public interface ITasksRepository {
      * @param text is the text of future task
      * @return created task with selected text
      */
-    Task create(String text);
+    Task create(String text, String owner);
 
     /**
      * Search task with this id through repository
