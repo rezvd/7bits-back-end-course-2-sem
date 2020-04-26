@@ -1,5 +1,6 @@
 package it.sevenbits.hwspring.web.controllers.exception.handler;
 
+import it.sevenbits.hwspring.core.service.signup.SignUpFailedException;
 import it.sevenbits.hwspring.web.controllers.exception.NotFoundException;
 import it.sevenbits.hwspring.web.controllers.exception.ValidationException;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -50,8 +52,10 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
      * @return ResponseEntity with http status code 400 (bad request)
      */
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex, final
-    HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex,
+                                                                  final HttpHeaders headers,
+                                                                  final HttpStatus status,
+                                                                  final WebRequest request) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -66,7 +70,18 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
-                                                                  final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+                                                                  final HttpHeaders headers,
+                                                                  final HttpStatus status,
+                                                                  final WebRequest request) {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(SignUpFailedException.class)
+    protected ResponseEntity<Object> handleSignUpFailedException(final MethodArgumentNotValidException ex,
+                                                                  final HttpHeaders headers,
+                                                                 final HttpStatus status,
+                                                                 final WebRequest request) {
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 }

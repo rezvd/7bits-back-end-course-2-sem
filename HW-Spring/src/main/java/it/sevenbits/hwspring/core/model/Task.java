@@ -21,8 +21,6 @@ public class Task {
     @NotBlank
     private final Date createdAt;
     private final Date updatedAt;
-    @NotBlank
-    private final String owner;
 
     /**
      * Constructor for task. Task can be created from json
@@ -38,14 +36,12 @@ public class Task {
                 @JsonProperty("text") final String text,
                 @JsonProperty("status") final String status,
                 @JsonProperty("createdAt") final Date createdAt,
-                @JsonProperty("updatedAt") final Date updatedAt,
-                @JsonProperty("owner") final String owner) {
+                @JsonProperty("updatedAt") final Date updatedAt) {
         this.id = id;
         this.text = text;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.status = status;
-        this.owner = owner;
     }
 
     public String getId() {
@@ -68,10 +64,6 @@ public class Task {
         return updatedAt;
     }
 
-    public String getOwner() {
-        return owner;
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -85,13 +77,12 @@ public class Task {
                 Objects.equals(text, task.text) &&
                 Objects.equals(status, task.status) &&
                 Objects.equals(createdAt.toString(), task.createdAt.toString()) &&
-                Objects.equals(updatedAt.toString(), task.updatedAt.toString()) &&
-                Objects.equals(owner, task.owner);
+                Objects.equals(updatedAt.toString(), task.updatedAt.toString());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, text, status, createdAt, updatedAt, owner);
+        return Objects.hash(id, text, status, createdAt, updatedAt);
     }
 }
 

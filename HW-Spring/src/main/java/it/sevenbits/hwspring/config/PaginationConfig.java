@@ -1,6 +1,7 @@
 package it.sevenbits.hwspring.config;
 
 import it.sevenbits.hwspring.web.model.tasks.Pagination;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,11 +10,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class PaginationConfig {
-    private static final int MIN_PAGE_SIZE = 10;
-    private static final int MAX_PAGE_SIZE = 50;
-    private static final int DEFAULT_PAGE_SIZE = 25;
-    private static final int DEFAULT_PAGE = 1;
-    private static final String DEFAULT_ORDER = "desc";
 
     /**
      * Set configuration for pagination: minimum, maximum and default page size, default order of sorting
@@ -21,7 +17,11 @@ public class PaginationConfig {
      * @return ready pagination
      */
     @Bean
-    public Pagination pagination() {
-        return new Pagination(MIN_PAGE_SIZE, MAX_PAGE_SIZE, DEFAULT_PAGE_SIZE, DEFAULT_PAGE, DEFAULT_ORDER);
+    public Pagination pagination(@Value("${pagination.min-page-size}") final int minPageSize,
+                                 @Value("${pagination.max-page-size}") final int maxPageSize,
+                                 @Value("${pagination.default-page-size}") final int defaultPageSize,
+                                 @Value("${pagination.default-page}") final int defaultPage,
+                                 @Value("${pagination.default-order}") final String defaultOrder) {
+        return new Pagination(minPageSize, maxPageSize, defaultPageSize, defaultPage, defaultOrder);
     }
 }

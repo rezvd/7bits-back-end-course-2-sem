@@ -60,4 +60,6 @@ public interface ITasksRepository {
      * @return number of tasks with this status
      */
     int count(String status);
+
+    String getOwner(String id);
 }

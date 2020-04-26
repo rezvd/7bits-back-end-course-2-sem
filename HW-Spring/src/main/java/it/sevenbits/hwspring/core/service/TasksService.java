@@ -1,12 +1,16 @@
 package it.sevenbits.hwspring.core.service;
 
+import com.google.gson.*;
 import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.repository.tasks.ITasksRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Service to coordinate work between repository and controller
@@ -131,12 +135,47 @@ public class TasksService {
      * @param pageSize is number of tasks on one page
      * @return list of tasks with certain status in the certain order, which place on the certain page
      */
-    public List<Task> getTasksWithPagination(final String status,
+    public JsonObject getTasksWithPagination(final String status,
                                              final String order,
                                              final int page,
                                              final int pageSize,
                                              final String owner) {
-        return tasksRepository.getTasksWithPagination(status, order, page, pageSize, owner);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    return new JsonPrimitive(dateFormat.format(date));
+                })
+                .create();
+        int count = getTasksNumber(status);
+        int pageN = getPagesNumber(status, pageSize);
+
+
+        JsonObject rootObject = new JsonObject();
+        JsonObject childObject = new JsonObject();
+        childObject.addProperty("total", count);
+        childObject.addProperty("page", page);
+        childObject.addProperty("size", pageSize);
+        if (page < pageN) {
+            childObject.addProperty("next",
+                    TasksService.getNextPage(status, order, page, pageSize).toString());
+        }
+        if (page > 1) {
+            childObject.addProperty("prev",
+                    TasksService.getPrevPage(status, order, page, pageSize).toString());
+        }
+
+        childObject.addProperty("first",
+                TasksService.getFirstPage(status, order, pageSize).toString());
+
+        childObject.addProperty("last",
+                TasksService.getLastPage(status, order, pageN, pageSize).toString());
+
+        rootObject.add("_meta", childObject);
+        rootObject.add("tasks", gson.toJsonTree(
+                tasksRepository.getTasksWithPagination(status, order, page, pageSize, owner)));
+
+        return rootObject;
     }
 
     /**
@@ -176,5 +215,9 @@ public class TasksService {
      */
     public Task create(final String text, final String owner) {
         return tasksRepository.create(text, owner);
+    }
+
+    public String getOwner(final String id) {
+        return tasksRepository.getOwner(id);
     }
 }

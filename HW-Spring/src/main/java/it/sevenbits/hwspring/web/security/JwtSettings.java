@@ -12,7 +12,6 @@ import java.time.Duration;
 @Component
 public class JwtSettings {
 
-    //TODO: add work with refresh token
     private final String tokenIssuer;
     private final String tokenSigningKey;
     private final int aTokenDuration;

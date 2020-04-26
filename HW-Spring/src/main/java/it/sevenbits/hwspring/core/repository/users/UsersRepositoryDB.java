@@ -14,14 +14,14 @@ import static java.lang.Boolean.TRUE;
 /**
  * Repository to list all users.
  */
-public class DatabaseUsersRepository implements UsersRepository {
+public class UsersRepositoryDB implements UsersRepository {
     private final JdbcOperations jdbcOperations;
     private final String AUTHORITY = "authority";
     private final String ID = "id";
     private final String USERNAME = "username";
     private final String PASSWORD = "password";
 
-    public DatabaseUsersRepository(final JdbcOperations jdbcOperations) {
+    public UsersRepositoryDB(final JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
     }
 
@@ -30,8 +30,8 @@ public class DatabaseUsersRepository implements UsersRepository {
 
         try {
             rawUser = jdbcOperations.queryForMap(
-                    "SELECT id, username, password FROM users u" +
-                            " WHERE u.enabled = true AND u.username = ?",
+                    "SELECT id, username, password FROM users" +
+                            " WHERE enabled = true AND username = ?",
                     username
             );
         } catch (IncorrectResultSizeDataAccessException e) {
@@ -61,8 +61,8 @@ public class DatabaseUsersRepository implements UsersRepository {
 
         try {
             rawUser = jdbcOperations.queryForMap(
-                    "SELECT id, username, password FROM users u" +
-                            " WHERE u.enabled = true AND u.id = ?",
+                    "SELECT id, username, password FROM users" +
+                            " WHERE enabled = true AND id = ?",
                     id
             );
         } catch (IncorrectResultSizeDataAccessException e) {

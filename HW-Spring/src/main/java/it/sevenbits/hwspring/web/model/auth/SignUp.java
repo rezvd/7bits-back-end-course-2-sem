@@ -11,7 +11,6 @@ import javax.validation.constraints.NotBlank;
 public class SignUp {
 
     private final String username;
-    @NotBlank
     private final String password;
 
     @JsonCreator

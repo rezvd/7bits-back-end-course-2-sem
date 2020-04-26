@@ -2,6 +2,7 @@ package it.sevenbits.hwspring.core.repository.tasks;
 
 import it.sevenbits.hwspring.core.model.Task;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 
 import java.sql.ResultSet;
@@ -57,7 +58,7 @@ public class TasksRepositoryDB implements ITasksRepository {
                 "INSERT INTO task (id, text, status, createdAt, updatedAt, owner) VALUES (?, ?, ?, ?, ?, ?)",
                 id, text, "inbox", date, date, owner
         );
-        return new Task(id, text, "inbox", date, date, owner);
+        return new Task(id, text, "inbox", date, date);
     }
 
     /**
@@ -123,7 +124,19 @@ public class TasksRepositoryDB implements ITasksRepository {
         String currentStatus = resultSet.getString("status");
         Date createdAt = resultSet.getTimestamp("createdAt");
         Date updatedAt = resultSet.getTimestamp("updatedAt");
-        String owner = resultSet.getString("owner");
-        return new Task(id, name, currentStatus, createdAt, updatedAt, owner);
+        return new Task(id, name, currentStatus, createdAt, updatedAt);
+    }
+
+    @Override
+    public String getOwner(final String id) {
+        try {
+            return jdbcOperations.queryForObject(
+                    "SELECT owner FROM task WHERE id = ?",
+                    String.class,
+                    id
+            );
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return null;
+        }
     }
 }

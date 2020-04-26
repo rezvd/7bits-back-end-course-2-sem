@@ -97,14 +97,6 @@ public class TasksController {
             actualPageSize = pageSize;
         }
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    return new JsonPrimitive(dateFormat.format(date));
-                })
-                .create();
-        int count = service.getTasksNumber(status);
         int pageN = service.getPagesNumber(status, actualPageSize);
 
         if (page == null || page < 1 || page > pageN) {
@@ -113,29 +105,7 @@ public class TasksController {
             actualPage = page;
         }
 
-        JsonObject rootObject = new JsonObject();
-        JsonObject childObject = new JsonObject();
-        childObject.addProperty("total", count);
-        childObject.addProperty("page", actualPage);
-        childObject.addProperty("size", actualPageSize);
-        if (actualPage < pageN) {
-            childObject.addProperty("next",
-                    TasksService.getNextPage(status, actualOrder, actualPage, actualPageSize).toString());
-        }
-        if (actualPage > 1) {
-            childObject.addProperty("prev",
-                    TasksService.getPrevPage(status, actualOrder, actualPage, actualPageSize).toString());
-        }
-
-        childObject.addProperty("first",
-                TasksService.getFirstPage(status, actualOrder, actualPageSize).toString());
-
-        childObject.addProperty("last",
-                TasksService.getLastPage(status, actualOrder, pageN, actualPageSize).toString());
-
-        rootObject.add("_meta", childObject);
-        rootObject.add("tasks", gson.toJsonTree(
-                service.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize, getCurrentUser())));
+        JsonObject rootObject = service.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize, getCurrentUser());
 
         return new ResponseEntity<>(rootObject.toString(), HttpStatus.OK);
     }
@@ -160,7 +130,7 @@ public class TasksController {
         if (task == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
         }
-        if (!task.getOwner().equals(getCurrentUser())) {
+        if (!service.getOwner(task.getId()).equals(getCurrentUser())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(task, HttpStatus.OK);
@@ -175,6 +145,7 @@ public class TasksController {
      * @throws NotFoundException   if task with such id doesn't exist
      * @throws ValidationException if id is not valid or status specified, but not valid
      */
+    @SuppressWarnings("checkstyle:RightCurly")
     @RequestMapping(value = "/{id}",
             method = RequestMethod.PATCH,
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -191,7 +162,6 @@ public class TasksController {
         }
         String status = previousTask.getStatus();
         String text = previousTask.getText();
-        String owner = previousTask.getOwner();
         if (StatusValidator.isValid(patchTaskRequest.getStatus())) {
             status = patchTaskRequest.getStatus();
         } else if (!(patchTaskRequest.getStatus() == null || patchTaskRequest.getStatus().equals(""))) {
@@ -199,8 +169,10 @@ public class TasksController {
         }
         if (!(patchTaskRequest.getText() == null || patchTaskRequest.getText().equals(""))) {
             text = patchTaskRequest.getText();
+        } else if (!StatusValidator.isValid(patchTaskRequest.getStatus())) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        service.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date(), owner));
+        service.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date()));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
