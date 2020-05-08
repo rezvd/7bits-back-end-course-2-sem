@@ -18,6 +18,7 @@ public class UsersRepositoryDB implements UsersRepository {
     private static final String ID = "id";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
+    private static final String ENABLED = "enabled";
 
     /**
      * Conctructor for UsersRepositoryDB
@@ -37,7 +38,7 @@ public class UsersRepositoryDB implements UsersRepository {
 
         try {
             rawUser = jdbcOperations.queryForMap(
-                    "SELECT id, username, password FROM users" +
+                    "SELECT id, username, password, enabled FROM users" +
                             " WHERE enabled = true AND username = ?",
                     username
             );
@@ -59,7 +60,8 @@ public class UsersRepositoryDB implements UsersRepository {
         );
 
         String password = String.valueOf(rawUser.get(PASSWORD));
-        return new User(id, username, password, authorities);
+        boolean enabled = (Boolean) rawUser.get(ENABLED);
+        return new User(id, username, password, authorities, enabled);
     }
 
     /**
@@ -72,7 +74,7 @@ public class UsersRepositoryDB implements UsersRepository {
 
         try {
             rawUser = jdbcOperations.queryForMap(
-                    "SELECT id, username, password FROM users" +
+                    "SELECT id, username, password, enabled FROM users" +
                             " WHERE enabled = true AND id = ?",
                     id
             );
@@ -93,7 +95,8 @@ public class UsersRepositoryDB implements UsersRepository {
 
         String username = String.valueOf(rawUser.get(USERNAME));
         String password = String.valueOf(rawUser.get(PASSWORD));
-        return new User(id, username, password, authorities);
+        boolean enabled = (Boolean) rawUser.get(ENABLED);
+        return new User(id, username, password, authorities, enabled);
 
     }
 
@@ -108,11 +111,12 @@ public class UsersRepositoryDB implements UsersRepository {
             String username = String.valueOf(row.get(USERNAME));
             String id = String.valueOf(row.get(ID));
             String password = String.valueOf(row.get(PASSWORD));
+            boolean enabled = (Boolean) row.get(ENABLED);
             List<String> auths = jdbcOperations.queryForList("(SELECT authority FROM authorities" +
                                                                     " WHERE user_id = ?)",
                     String.class,
                     id);
-            users.add(new User(id, username, password, auths));
+            users.add(new User(id, username, password, auths, enabled));
         }
         return users;
     }
@@ -138,7 +142,7 @@ public class UsersRepositoryDB implements UsersRepository {
                     id, a
             );
         }
-        return new User(id, username, password, authorities);
+        return new User(id, username, password, authorities, TRUE);
     }
 
 

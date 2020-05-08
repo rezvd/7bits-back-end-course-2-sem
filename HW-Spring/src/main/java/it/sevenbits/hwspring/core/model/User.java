@@ -20,6 +20,9 @@ public class User {
     @JsonIgnore
     private final String password;
 
+    @JsonIgnore
+    private final boolean enabled;
+
     /**
      * Constructor for User
      * @param id is a unique user ID
@@ -27,11 +30,16 @@ public class User {
      * @param password is a password of user
      * @param authorities is a list of user's roles
      */
-    public User(final String id, final String username, final String password, final List<String> authorities) {
+    public User(final String id,
+                final String username,
+                final String password,
+                final List<String> authorities,
+                final boolean enabled) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
+        this.enabled = enabled;
     }
 
     /**
@@ -41,17 +49,22 @@ public class User {
      * @param authorities is a list of user's roles
      */
     @JsonCreator
-    public User(final String id, final String username,  final List<String> authorities) {
+    public User(@JsonProperty("id") final String id,
+                @JsonProperty("username") final String username,
+                @JsonProperty("authorities") final List<String> authorities,
+                @JsonProperty("enabled") final boolean enabled) {
         this.id = id;
         this.username = username;
         this.password = null;
         this.authorities = authorities;
+        this.enabled = enabled;
     }
 
     public String getUsername() {
         return username;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -64,16 +77,18 @@ public class User {
         return id;
     }
 
+    @JsonIgnore
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id.equals(user.id) &&
+        return enabled == user.enabled &&
+                id.equals(user.id) &&
                 username.equals(user.username) &&
                 authorities.equals(user.authorities) &&
                 Objects.equals(password, user.password);
@@ -81,6 +96,6 @@ public class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, authorities, password);
+        return Objects.hash(id, username, authorities, password, enabled);
     }
 }
