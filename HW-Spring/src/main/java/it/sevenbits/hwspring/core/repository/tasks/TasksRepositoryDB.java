@@ -58,7 +58,7 @@ public class TasksRepositoryDB implements ITasksRepository {
                 "INSERT INTO task (id, text, status, createdAt, updatedAt, owner) VALUES (?, ?, ?, ?, ?, ?)",
                 id, text, "inbox", date, date, owner
         );
-        return new Task(id, text, "inbox", date, date);
+        return new Task(id, text, "inbox", date, date, owner);
     }
 
     /**
@@ -71,7 +71,7 @@ public class TasksRepositoryDB implements ITasksRepository {
     public Task getById(final String id) {
         try {
             return jdbcOperations.queryForObject(
-                    "SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?",
+                    "SELECT id, text, status, createdAt, updatedAt, owner FROM task WHERE id = ?",
                     (resultSet, i) -> buildTask(resultSet),
                     id);
         } catch (EmptyResultDataAccessException e) {
@@ -124,7 +124,8 @@ public class TasksRepositoryDB implements ITasksRepository {
         String currentStatus = resultSet.getString("status");
         Date createdAt = resultSet.getTimestamp("createdAt");
         Date updatedAt = resultSet.getTimestamp("updatedAt");
-        return new Task(id, name, currentStatus, createdAt, updatedAt);
+        String owner = resultSet.getString("owner");
+        return new Task(id, name, currentStatus, createdAt, updatedAt, owner);
     }
 
     @Override

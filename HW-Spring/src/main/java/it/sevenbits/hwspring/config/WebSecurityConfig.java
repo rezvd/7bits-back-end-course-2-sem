@@ -60,6 +60,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests().antMatchers("/users/**").hasAuthority("ADMIN")
                 .and()
+                .authorizeRequests().antMatchers("/tasks", "/tasks/**").hasAnyAuthority("ADMIN", "USER")
+                .and()
                 .authorizeRequests().anyRequest().authenticated();
     }
 

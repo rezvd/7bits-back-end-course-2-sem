@@ -193,6 +193,7 @@ public class TasksController {
         }
         String status = previousTask.getStatus();
         String text = previousTask.getText();
+        String owner = previousTask.getOwner();
         if (StatusValidator.isValid(patchTaskRequest.getStatus())) {
             status = patchTaskRequest.getStatus();
         } else if (!(patchTaskRequest.getStatus() == null || patchTaskRequest.getStatus().equals(""))) {
@@ -203,7 +204,7 @@ public class TasksController {
         } else if (!StatusValidator.isValid(patchTaskRequest.getStatus())) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        tasksService.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date()));
+        tasksService.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date(), owner));
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
