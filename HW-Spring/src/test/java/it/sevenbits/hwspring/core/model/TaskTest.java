@@ -14,7 +14,8 @@ public class TaskTest {
         Date current = new Date();
         String name = "Do homework";
         String status = "inbox";
-        Task task = new Task(id, name, status, current, null);
+        String owner = "owner";
+        Task task = new Task(id, name, status, current, null, owner);
 
         Assert.assertEquals(id, task.getId());
         Assert.assertEquals(name, task.getText());

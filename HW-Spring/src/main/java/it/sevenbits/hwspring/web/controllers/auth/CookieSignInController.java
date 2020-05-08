@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Performs sign in action.
  */
-@RequestMapping("/signin")
+//@RequestMapping("/signin")
 public class CookieSignInController {
 
     private final SignInService signInService;

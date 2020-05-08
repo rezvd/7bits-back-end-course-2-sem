@@ -69,12 +69,13 @@ public class Task {
         return updatedAt;
     }
 
+    @JsonIgnore
     public String getOwner() {
         return owner;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;

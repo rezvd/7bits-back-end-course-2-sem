@@ -87,7 +87,7 @@ public class TasksRepositoryDBTest {
         String id = UUID.randomUUID().toString();
         Date date = new Date();
 
-        tasksRepository.update(new Task(id, text, status, null, date));
+        tasksRepository.update(new Task(id, text, status, null, date, owner));
 
         verify(mockJdbc, times(1)).update(
                 eq("UPDATE task SET text = ?, status = ?,  updatedAt = ? WHERE id = ?"),
