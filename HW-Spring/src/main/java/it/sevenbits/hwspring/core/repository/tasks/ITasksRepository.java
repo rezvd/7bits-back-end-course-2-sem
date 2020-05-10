@@ -45,7 +45,7 @@ public interface ITasksRepository {
      *
      * @param newTask is the task, which id will be used to find existing task and
      *                which text and status will be used to update current task
-     * @param previousTask is the old task which need to be updated
+     * @param previousTask is old task data to keep old information in fields which don't have new data
      */
     void update(Task newTask, Task previousTask);
 

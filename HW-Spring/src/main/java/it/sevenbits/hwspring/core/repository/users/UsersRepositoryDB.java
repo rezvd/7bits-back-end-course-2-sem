@@ -75,7 +75,7 @@ public class UsersRepositoryDB implements UsersRepository {
         try {
             rawUser = jdbcOperations.queryForMap(
                     "SELECT id, username, password, enabled FROM users" +
-                            " WHERE enabled = true AND id = ?",
+                            " WHERE id = ?",
                     id
             );
         } catch (IncorrectResultSizeDataAccessException e) {
@@ -143,6 +143,15 @@ public class UsersRepositoryDB implements UsersRepository {
             );
         }
         return new User(id, username, password, authorities, TRUE);
+    }
+
+    @Override
+    public void update(final User newUser, final User previousUser) {
+        jdbcOperations.update(
+                "UPDATE users SET enabled = COALESCE(?, ?) WHERE id = ?",
+                newUser.isEnabled(), previousUser.isEnabled(),
+                newUser.getId()
+        );
     }
 
 

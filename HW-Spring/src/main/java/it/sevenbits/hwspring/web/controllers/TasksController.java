@@ -112,7 +112,6 @@ public class TasksController {
      * @throws NotFoundException   if task with such id doesn't exist
      * @throws ValidationException if id is not valid or status specified, but not valid
      */
-    @SuppressWarnings("checkstyle:RightCurly")
     @RequestMapping(value = "/{id}",
             method = RequestMethod.PATCH,
             consumes = MediaType.APPLICATION_JSON_VALUE,

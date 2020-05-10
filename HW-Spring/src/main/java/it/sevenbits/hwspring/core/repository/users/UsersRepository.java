@@ -37,4 +37,11 @@ public interface UsersRepository {
      */
     User create(String username, String password, List<String> authorities);
 
+    /**
+     * Changes existing user according with new data
+     * @param newUser is a user to get data from for updating
+     * @param previousUser is old user data to keep old information in fields which don't have new data
+     */
+    void update(User newUser, User previousUser);
+
 }
