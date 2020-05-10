@@ -1,7 +1,7 @@
 package it.sevenbits.hwspring.config;
 
+import it.sevenbits.hwspring.web.controllers.auth.HeaderSignUpController;
 import it.sevenbits.hwspring.web.service.signup.SignUpService;
-import it.sevenbits.hwspring.web.controllers.auth.CookieSignUpController;
 import it.sevenbits.hwspring.web.security.JwtTokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +17,6 @@ public class SignUpConfig {
      */
     @Bean
     public Object signUpController(final SignUpService signUpService, final JwtTokenService jwtTokenService) {
-        return new CookieSignUpController(signUpService, jwtTokenService);
+        return new HeaderSignUpController(signUpService, jwtTokenService);
     }
 }

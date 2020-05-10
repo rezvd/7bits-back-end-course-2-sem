@@ -2,9 +2,10 @@ package it.sevenbits.hwspring.core.service;
 
 import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.repository.tasks.ITasksRepository;
+import it.sevenbits.hwspring.web.model.tasks.GetAllTasksResponse;
+import it.sevenbits.hwspring.web.model.tasks.Pagination;
+import it.sevenbits.hwspring.web.model.tasks.TasksMeta;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -13,24 +14,18 @@ import java.util.List;
 @Service
 public class TasksService {
     private final ITasksRepository tasksRepository;
+    private final Pagination pagination;
 
     /**
      * Constructor for TasksService
      *
      * @param tasksRepository is the repository for tasks
+     * @param pagination   is the pagination to give tasks with right page, page size and order
      */
-    public TasksService(final ITasksRepository tasksRepository) {
+    public TasksService(final ITasksRepository tasksRepository,
+                        final Pagination pagination) {
         this.tasksRepository = tasksRepository;
-    }
-
-    /**
-     * Method to get number of the tasks with some status
-     *
-     * @param status is a status to filter tasks
-     * @return number of tasks with such status
-     */
-    public int getTasksNumber(final String status) {
-        return tasksRepository.count(status);
+        this.pagination = pagination;
     }
 
     /**
@@ -41,84 +36,12 @@ public class TasksService {
      * @return number of pages with certain size, filled with tasks by certain status.
      * If there is no tasks, the pages number is 1
      */
-    public int getPagesNumber(final String status, final int pageSize) {
-        int tasksNumber = getTasksNumber(status);
-        int pageN = (int) Math.ceil((double) tasksNumber / pageSize);
-        if (pageN == 0) {
-            pageN = 1;
+    private int getPagesNumber(final String status, final int pageSize, final int tasksNumber) {
+        int pageNumber = (int) Math.ceil((double) tasksNumber / pageSize);
+        if (pageNumber == 0) {
+            pageNumber = 1;
         }
-        return pageN;
-    }
-
-    /**
-     * Builds URI link to the next page
-     *
-     * @param status   is a status of the tasks
-     * @param order    is an order to sort tasks
-     * @param page     is a current page
-     * @param pageSize is number of tasks on one page
-     * @return URI from "/tasks" with these parameters as a query, which leads to the next page
-     */
-    public static URI getNextPage(final String status, final String order, final int page, final int pageSize) {
-        return UriComponentsBuilder.fromPath("/tasks")
-                .queryParam("status", status)
-                .queryParam("order", order)
-                .queryParam("page", page + 1)
-                .queryParam("size", pageSize)
-                .build().toUri();
-    }
-
-    /**
-     * Builds URI link to the previous page
-     *
-     * @param status   is a status of the tasks
-     * @param order    is an order to sort tasks
-     * @param page     is a current page
-     * @param pageSize is number of tasks on one page
-     * @return URI from "/tasks" with these parameters as a query, which leads to the previous page
-     */
-    public static URI getPrevPage(final String status, final String order, final int page, final int pageSize) {
-        return UriComponentsBuilder.fromPath("/tasks")
-                .queryParam("status", status)
-                .queryParam("order", order)
-                .queryParam("page", page == 1 ? 1 : page - 1)
-                .queryParam("size", pageSize)
-                .build().toUri();
-    }
-
-    /**
-     * Builds URI link to the first page
-     *
-     * @param status   is a status of the tasks
-     * @param order    is an order to sort tasks
-     * @param pageSize is number of tasks on one page
-     * @return URI from "/tasks" with these parameters as a query, which leads to the first page
-     */
-    public static URI getFirstPage(final String status, final String order, final int pageSize) {
-        return UriComponentsBuilder.fromPath("/tasks")
-                .queryParam("status", status)
-                .queryParam("order", order)
-                .queryParam("page", 1)
-                .queryParam("size", pageSize)
-                .build().toUri();
-    }
-
-    /**
-     * Builds URI link to the last page
-     *
-     * @param status      is a status of the tasks
-     * @param order       is an order to sort tasks
-     * @param pagesNumber is a number of pages with such status and size
-     * @param pageSize    is number of tasks on one page
-     * @return URI from "/tasks" with these parameters as a query, which leads to the last page
-     */
-    public static URI getLastPage(final String status, final String order, final int pagesNumber, final int pageSize) {
-        return UriComponentsBuilder.fromPath("/tasks")
-                .queryParam("status", status)
-                .queryParam("order", order)
-                .queryParam("page", pagesNumber)
-                .queryParam("size", pageSize)
-                .build().toUri();
+        return pageNumber;
     }
 
     /**
@@ -131,12 +54,29 @@ public class TasksService {
      * @param owner    is the ID of user whose task are needed
      * @return list of tasks with certain status in the certain order, which place on the certain page
      */
-    public List<Task> getTasksWithPagination(final String status,
-                                             final String order,
-                                             final int page,
-                                             final int pageSize,
-                                             final String owner) {
-        return tasksRepository.getTasksWithPagination(status, order, page, pageSize, owner);
+    public GetAllTasksResponse getTasksWithPagination(final String status,
+                                                      final String order,
+                                                      final Integer page,
+                                                      final Integer pageSize,
+                                                      final String owner) {
+        String actualOrder = order;
+        Integer actualPage = page;
+        Integer actualPageSize = pageSize;
+        if (order == null || order.equals("")) {
+            actualOrder = pagination.getDefaultOrder();
+        }
+        if (pageSize == null || pageSize < pagination.getMinPageSize() || pageSize > pagination.getMaxPageSize()) {
+            actualPageSize = pagination.getDefaultPageSize();
+        }
+        int count = tasksRepository.count(status, owner);
+        int pageNumber = getPagesNumber(status, actualPageSize, count);
+        if (page == null || page < 1 || page > pageNumber) {
+            actualPage = pagination.getDefaultPage();
+        }
+        List<Task> tasks = tasksRepository.getTasksWithPagination(status, actualOrder,
+                actualPage, actualPageSize, owner);
+        TasksMeta meta = new TasksMeta(count, actualPageSize, actualPage, pageNumber, status, order);
+        return new GetAllTasksResponse(meta, tasks);
     }
 
     /**
@@ -154,9 +94,10 @@ public class TasksService {
      *
      * @param newTask is the task, which id will be used to find existing task and
      *                which other params will be used to update current task
+     * @param previousTask is the old task which need to be updated
      */
-    public void update(final Task newTask) {
-        tasksRepository.update(newTask);
+    public void update(final Task newTask, final Task previousTask) {
+        tasksRepository.update(newTask, previousTask);
     }
 
     /**
@@ -179,12 +120,4 @@ public class TasksService {
         return tasksRepository.create(text, owner);
     }
 
-    /**
-     * Find a task by id and return its owner
-     * @param id is an ID of the task
-     * @return ID of user which own this task
-     */
-    public String getOwner(final String id) {
-        return tasksRepository.getOwner(id);
-    }
 }

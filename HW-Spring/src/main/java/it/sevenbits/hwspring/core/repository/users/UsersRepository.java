@@ -24,8 +24,9 @@ public interface UsersRepository {
     /**
      * Make a list with all users in the repository
      * @return list with all users
+     * @param enabled is a param for searching users
      */
-    List<User> findAllUsers();
+    List<User> findAllUsers(boolean enabled);
 
     /**
      * Puts new user to the repository

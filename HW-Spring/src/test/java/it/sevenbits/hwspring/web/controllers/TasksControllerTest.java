@@ -36,6 +36,7 @@ public class TasksControllerTest {
     private WhoamiService whoamiService;
     private TasksService tasksService;
 
+/*
     @Before
     public void setup() {
         tasksService = mock(TasksService.class);
@@ -43,7 +44,7 @@ public class TasksControllerTest {
         tasksController = new TasksController(tasksService, whoamiService,
                 new Pagination(3, 50, 25, 1, "desc"));
     }
-/*
+
     @Test
     public void getAllTasksTest() throws ValidationException {
         String status = "inbox";

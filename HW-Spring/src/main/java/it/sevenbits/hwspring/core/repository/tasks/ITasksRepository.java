@@ -45,8 +45,9 @@ public interface ITasksRepository {
      *
      * @param newTask is the task, which id will be used to find existing task and
      *                which text and status will be used to update current task
+     * @param previousTask is the old task which need to be updated
      */
-    void update(Task newTask);
+    void update(Task newTask, Task previousTask);
 
     /**
      * Deletes tasks with this id
@@ -59,14 +60,8 @@ public interface ITasksRepository {
      * Calculate number of tasks with certain status
      *
      * @param status is the status to select task
+     * @param owner is the id of owner whose tasks will be counted
      * @return number of tasks with this status
      */
-    int count(String status);
-
-    /**
-     * Find a task by id and return its owner
-     * @param id is an ID of the task
-     * @return ID of user which own this task
-     */
-    String getOwner(String id);
+    int count(String status, String owner);
 }

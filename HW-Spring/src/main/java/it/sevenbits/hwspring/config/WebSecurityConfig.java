@@ -1,6 +1,5 @@
 package it.sevenbits.hwspring.config;
 
-import it.sevenbits.hwspring.web.security.CookieJwtAuthFilter;
 import it.sevenbits.hwspring.web.security.HeaderJwtAuthFilter;
 import it.sevenbits.hwspring.web.security.JsonWebTokenService;
 import it.sevenbits.hwspring.web.security.JwtAuthFilter;
@@ -35,10 +34,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.jwtTokenService = jwtTokenService;
     }
 
-
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable();
+        http.cors();
         http.formLogin().disable();
         http.logout().disable();
         http.sessionManagement().disable();
@@ -51,7 +50,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         RequestMatcher notLoginPageMatcher = new NegatedRequestMatcher(signinAndSignup);
 
         JwtAuthFilter authFilter = new HeaderJwtAuthFilter(notLoginPageMatcher);
-        //JwtAuthFilter authFilter = new CookieJwtAuthFilter(notLoginPageMatcher);
         http.addFilterBefore(authFilter, FilterSecurityInterceptor.class);
 
         http
@@ -61,8 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests().antMatchers("/users/**").hasAuthority("ADMIN")
                 .and()
-                .authorizeRequests().antMatchers("/tasks", "/tasks/**")
-                            .hasAnyAuthority("ADMIN", "USER")
+                .authorizeRequests().antMatchers("/tasks", "/tasks/**").hasAuthority("USER")
                 .and()
                 .authorizeRequests().anyRequest().authenticated();
     }

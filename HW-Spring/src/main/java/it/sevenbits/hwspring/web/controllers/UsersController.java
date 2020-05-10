@@ -34,7 +34,7 @@ public class UsersController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(usersRepository.findAllUsers());
+        return ResponseEntity.ok(usersRepository.findAllUsers(true));
     }
 
     /**

@@ -102,16 +102,16 @@ public class UsersRepositoryDB implements UsersRepository {
 
     /**
      * Make a list with all users in the repository
+     * @param enabled is a param for searching users
      * @return list with all users
      */
-    public List<User> findAllUsers() {
+    public List<User> findAllUsers(final boolean enabled) {
         ArrayList<User> users = new ArrayList<>();
         for (Map<String, Object> row : jdbcOperations.queryForList(
-                "(SELECT * FROM users u WHERE u.enabled = true)")) {
+                "(SELECT * FROM users u WHERE u.enabled = ?)", enabled)) {
             String username = String.valueOf(row.get(USERNAME));
             String id = String.valueOf(row.get(ID));
             String password = String.valueOf(row.get(PASSWORD));
-            boolean enabled = (Boolean) row.get(ENABLED);
             List<String> auths = jdbcOperations.queryForList("(SELECT authority FROM authorities" +
                                                                     " WHERE user_id = ?)",
                     String.class,

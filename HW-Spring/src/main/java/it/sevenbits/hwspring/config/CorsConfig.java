@@ -10,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import java.util.regex.Pattern;
 
 
+
 @Configuration
 public class CorsConfig {
 
@@ -17,13 +18,13 @@ public class CorsConfig {
     private String allowOrigins;
 
     @Value("${corsHeaders.allowCredentials:true}")
-    private final boolean  allowCredentials = true;
+    private final boolean allowCredentials = true;
 
-    @Value("${corsHeaders.allowMethods:GET,POST,OPTIONS}")
+    @Value("${corsHeaders.allowMethods:GET,POST,DELETE,PATCH,OPTIONS}")
     private String allowMethods;
 
-    @Value("${corsHeaders.allowHeaders:Authorization,Origin,Accept,Key,DNT,Keep-Alive,User-Agent,X-Requested-With," +
-            "If-Modified-Since,Cache-Control,Content-Type}")
+    @Value("${corsHeaders.allowHeaders:Authorization,Origin,Accept,Key,DNT,Keep-Alive,User-Agent," +
+            "X-Requested-With,If-Modified-Since,Cache-Control,Content-Type}")
     private String allowHeaders;
 
     private final Pattern delimiter = Pattern.compile("[,\\s]+");

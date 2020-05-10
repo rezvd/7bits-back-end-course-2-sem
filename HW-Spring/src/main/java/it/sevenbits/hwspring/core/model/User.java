@@ -29,6 +29,7 @@ public class User {
      * @param username is a username, chosen by user
      * @param password is a password of user
      * @param authorities is a list of user's roles
+     * @param enabled shows if this user profile is enabled
      */
     public User(final String id,
                 final String username,
@@ -47,6 +48,7 @@ public class User {
      * @param id is a unique user ID
      * @param username is a username, chosen by user
      * @param authorities is a list of user's roles
+     * @param enabled shows if this user profile is enabled
      */
     @JsonCreator
     public User(@JsonProperty("id") final String id,
@@ -83,9 +85,13 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         User user = (User) o;
         return enabled == user.enabled &&
                 id.equals(user.id) &&

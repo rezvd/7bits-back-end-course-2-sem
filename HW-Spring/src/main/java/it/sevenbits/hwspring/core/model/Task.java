@@ -33,6 +33,7 @@ public class Task {
      * @param status    is status of this task
      * @param createdAt is the date and time, when this task was created
      * @param updatedAt is the date and time, when this task was updated
+     * @param owner     is the is of the owner of this task
      */
     @JsonCreator
     public Task(@JsonProperty("id") final String id,
@@ -76,8 +77,12 @@ public class Task {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Task task = (Task) o;
         return id.equals(task.id) &&
                 text.equals(task.text) &&

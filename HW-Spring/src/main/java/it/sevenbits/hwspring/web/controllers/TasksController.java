@@ -1,10 +1,5 @@
 package it.sevenbits.hwspring.web.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
 import it.sevenbits.hwspring.core.model.Task;
 import it.sevenbits.hwspring.core.service.TasksService;
 import it.sevenbits.hwspring.core.service.validation.OrderValidator;
@@ -13,7 +8,7 @@ import it.sevenbits.hwspring.core.service.validation.UUIDValidator;
 import it.sevenbits.hwspring.web.controllers.exception.NotFoundException;
 import it.sevenbits.hwspring.web.controllers.exception.ValidationException;
 import it.sevenbits.hwspring.web.model.tasks.AddTaskRequest;
-import it.sevenbits.hwspring.web.model.tasks.Pagination;
+import it.sevenbits.hwspring.web.model.tasks.GetAllTasksResponse;
 import it.sevenbits.hwspring.web.model.tasks.PatchTaskRequest;
 import it.sevenbits.hwspring.web.service.WhoamiService;
 import org.springframework.http.HttpStatus;
@@ -29,9 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Controller, which handles requests from /tasks
@@ -39,7 +32,6 @@ import java.util.TimeZone;
 @Controller
 @RequestMapping("/tasks")
 public class TasksController {
-    private final Pagination pagination;
     private final TasksService tasksService;
     private final WhoamiService whoamiService;
 
@@ -48,12 +40,9 @@ public class TasksController {
      *
      * @param tasksService is the service for work with repository
      * @param whoamiService is the service for identify current user
-     * @param pagination   is the pagination to give tasks with right page, page size and order
      */
-    public TasksController(final TasksService tasksService, final WhoamiService whoamiService,
-                           final Pagination pagination) {
+    public TasksController(final TasksService tasksService, final WhoamiService whoamiService) {
         this.tasksService = tasksService;
-        this.pagination = pagination;
         this.whoamiService = whoamiService;
     }
 
@@ -71,7 +60,7 @@ public class TasksController {
     @RequestMapping(method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<String> getTasksWithPagination(
+    public ResponseEntity<GetAllTasksResponse> getTasksWithPagination(
             @RequestParam(value = "status", defaultValue = "inbox") final String status,
             @RequestParam(value = "order", required = false) final String order,
             @RequestParam(value = "page", required = false) final Integer page,
@@ -80,65 +69,12 @@ public class TasksController {
         if (!StatusValidator.isValid(status)) {
             throw new ValidationException(String.format("Status \"%s\" is not valid", status));
         }
-
-        String actualOrder = order;
-        if (actualOrder == null || actualOrder.equals("")) {
-            actualOrder = pagination.getDefaultOrder();
-        }
-        if (!OrderValidator.isValid(actualOrder)) {
+        if (order != null && !OrderValidator.isValid(order)) {
             throw new ValidationException(String.format("Order \"%s\" is not valid", order));
         }
-
-        int actualPage;
-        int actualPageSize;
-
-        if (pageSize == null || pageSize < pagination.getMinPageSize() || pageSize > pagination.getMaxPageSize()) {
-            actualPageSize = pagination.getDefaultPageSize();
-        } else {
-            actualPageSize = pageSize;
-        }
-
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    return new JsonPrimitive(dateFormat.format(date));
-                })
-                .create();
-        int count = tasksService.getTasksNumber(status);
-        int pageN = tasksService.getPagesNumber(status, actualPageSize);
-
-        if (page == null || page < 1 || page > pageN) {
-            actualPage = pagination.getDefaultPage();
-        } else {
-            actualPage = page;
-        }
-
-        JsonObject rootObject = new JsonObject();
-        JsonObject childObject = new JsonObject();
-        childObject.addProperty("total", count);
-        childObject.addProperty("page", actualPage);
-        childObject.addProperty("size", actualPageSize);
-        if (actualPage < pageN) {
-            childObject.addProperty("next",
-                    TasksService.getNextPage(status, actualOrder, actualPage, actualPageSize).toString());
-        }
-        if (actualPage > 1) {
-            childObject.addProperty("prev",
-                    TasksService.getPrevPage(status, actualOrder, actualPage, actualPageSize).toString());
-        }
-
-        childObject.addProperty("first",
-                TasksService.getFirstPage(status, actualOrder, actualPageSize).toString());
-
-        childObject.addProperty("last",
-                TasksService.getLastPage(status, actualOrder, pageN, actualPageSize).toString());
-
-        rootObject.add("_meta", childObject);
-        rootObject.add("tasks", gson.toJsonTree(
-                tasksService.getTasksWithPagination(status, actualOrder, actualPage, actualPageSize, getCurrentUserId())));
-
-        return new ResponseEntity<>(rootObject.toString(), HttpStatus.OK);
+        GetAllTasksResponse response = tasksService.getTasksWithPagination(status, order, page,
+                pageSize, getCurrentUserId());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
@@ -153,7 +89,7 @@ public class TasksController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity getByID(@PathVariable final String id) throws NotFoundException, ValidationException {
+    public ResponseEntity<Task> getByID(@PathVariable final String id) throws NotFoundException, ValidationException {
         if (!UUIDValidator.isValid(id)) {
             throw new ValidationException(String.format("ID \"%s\" is not valid", id));
         }
@@ -161,7 +97,7 @@ public class TasksController {
         if (task == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
         }
-        if (!tasksService.getOwner(task.getId()).equals(getCurrentUserId())) {
+        if (!task.getOwner().equals(getCurrentUserId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(task, HttpStatus.OK);
@@ -187,24 +123,19 @@ public class TasksController {
         if (!UUIDValidator.isValid(id)) {
             throw new ValidationException(String.format("ID \"%s\" is not valid", id));
         }
+        if (!StatusValidator.isValid(patchTaskRequest.getStatus()) && patchTaskRequest.getText() == null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
         Task previousTask = tasksService.getById(id);
         if (previousTask == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
         }
-        String status = previousTask.getStatus();
-        String text = previousTask.getText();
         String owner = previousTask.getOwner();
-        if (StatusValidator.isValid(patchTaskRequest.getStatus())) {
-            status = patchTaskRequest.getStatus();
-        } else if (!(patchTaskRequest.getStatus() == null || patchTaskRequest.getStatus().equals(""))) {
-            throw new ValidationException(String.format("Status \"%s\" is not valid", patchTaskRequest.getStatus()));
+        if (!owner.equals(getCurrentUserId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        if (!(patchTaskRequest.getText() == null || patchTaskRequest.getText().equals(""))) {
-            text = patchTaskRequest.getText();
-        } else if (!StatusValidator.isValid(patchTaskRequest.getStatus())) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
-        tasksService.update(new Task(id, text, status, previousTask.getCreatedAt(), new Date(), owner));
+        tasksService.update(new Task(id, patchTaskRequest.getText(), patchTaskRequest.getStatus(),
+                previousTask.getCreatedAt(), new Date(), owner), previousTask);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -224,8 +155,12 @@ public class TasksController {
         if (!UUIDValidator.isValid(id)) {
             throw new ValidationException(String.format("ID \"%s\" is not valid", id));
         }
-        if (tasksService.getById(id) == null) {
+        Task task = tasksService.getById(id);
+        if (task == null) {
             throw new NotFoundException(String.format("Task with id \"%s\" wasn't found", id));
+        }
+        if (!task.getOwner().equals(getCurrentUserId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         tasksService.delete(id);
         return new ResponseEntity(HttpStatus.OK);
@@ -248,7 +183,6 @@ public class TasksController {
                 .build().toUri();
         return ResponseEntity.created(location).body(task);
     }
-
     private String getCurrentUserId() {
         return whoamiService.getUserFromContext().getId();
     }

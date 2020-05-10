@@ -2,7 +2,6 @@ package it.sevenbits.hwspring.core.repository.tasks;
 
 import it.sevenbits.hwspring.core.model.Task;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 
 import java.sql.ResultSet;
@@ -87,10 +86,13 @@ public class TasksRepositoryDB implements ITasksRepository {
      *                which text and status will be used to update current task
      */
     @Override
-    public void update(final Task newTask) {
+    public void update(final Task newTask, final Task previousTask) {
         jdbcOperations.update(
-                "UPDATE task SET text = ?, status = ?,  updatedAt = ? WHERE id = ?",
-                newTask.getText(), newTask.getStatus(), newTask.getUpdatedAt(), newTask.getId()
+                "UPDATE task SET text = COALESCE(?, ?)," +
+                        "status = COALESCE(?, ?),  updatedAt = ? WHERE id = ?",
+                newTask.getText(), previousTask.getText(),
+                newTask.getStatus(), previousTask.getStatus(),
+                newTask.getUpdatedAt(), newTask.getId()
         );
     }
 
@@ -105,8 +107,10 @@ public class TasksRepositoryDB implements ITasksRepository {
     }
 
     @Override
-    public int count(final String status) {
-        return jdbcOperations.queryForObject("SELECT COUNT (*) FROM task WHERE status = ?", Integer.class, status);
+    public int count(final String status,
+                     final String owner) {
+        return jdbcOperations.queryForObject("SELECT COUNT (*) FROM task WHERE status = ? AND owner = ?",
+                Integer.class, status, owner);
     }
 
     /**
@@ -126,18 +130,5 @@ public class TasksRepositoryDB implements ITasksRepository {
         Date updatedAt = resultSet.getTimestamp("updatedAt");
         String owner = resultSet.getString("owner");
         return new Task(id, name, currentStatus, createdAt, updatedAt, owner);
-    }
-
-    @Override
-    public String getOwner(final String id) {
-        try {
-            return jdbcOperations.queryForObject(
-                    "SELECT owner FROM task WHERE id = ?",
-                    String.class,
-                    id
-            );
-        } catch (IncorrectResultSizeDataAccessException e) {
-            return null;
-        }
     }
 }

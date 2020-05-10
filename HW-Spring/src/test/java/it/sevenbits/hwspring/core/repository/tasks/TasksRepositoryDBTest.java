@@ -35,7 +35,7 @@ public class TasksRepositoryDBTest {
     int pageSize = 25;
     int count = 1;
 
-
+/*
 
     @Before
     public void setup() {
@@ -133,4 +133,5 @@ public class TasksRepositoryDBTest {
         Assert.assertEquals(actual.getCreatedAt(), actual.getUpdatedAt());
     }
 
+ */
 }
