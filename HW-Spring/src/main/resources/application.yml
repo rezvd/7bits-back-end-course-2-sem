@@ -13,7 +13,7 @@ spring:
 jwt:
   issuer: 'rezv.daria@gmail.com'
   signingKey: 'TALSPOC120NXJSAPQKE1D77'
-  aTokenDuration: 300000
+  aTokenDuration: 30
 
 pagination:
   min-page-size: 10

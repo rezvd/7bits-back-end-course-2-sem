@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <property name="APP" value="eisetasks"/>
+    <property name="LOG_PATTERN"
+              value="[%thread] %-5level %-70logger - %msg%n"/>
+    <property name="FILENAME_PATTERN"
+              value="${APP}_%d{yyyy_MM_dd_HH}.gz"/>
+    <property name="LOG_PATH" value="logs"/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${FILENAME_PATTERN}</fileNamePattern>
+            <maxHistory>24</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF8</charset>
+        </encoder>
+    </appender>
+
+    <root>
+        <appender-ref ref="file" />
+    </root>
+</configuration>
