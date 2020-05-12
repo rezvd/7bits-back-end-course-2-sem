@@ -9,8 +9,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 import java.util.regex.Pattern;
 
-
-
+/**
+ * Configures preflight requests
+ */
 @Configuration
 public class CorsConfig {
 

@@ -2,9 +2,11 @@ package it.sevenbits.hwspring.web.model.tasks;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import java.net.URI;
 
+/**
+ * Model to store all information about tasks array in GetAllTasksResponse
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TasksMeta {
 

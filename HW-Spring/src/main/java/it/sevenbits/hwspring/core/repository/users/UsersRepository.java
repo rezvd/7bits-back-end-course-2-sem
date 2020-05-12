@@ -5,6 +5,9 @@ import it.sevenbits.hwspring.core.model.User;
 
 import java.util.List;
 
+/**
+ * Interface for repository to store users information
+ */
 public interface UsersRepository {
 
     /**

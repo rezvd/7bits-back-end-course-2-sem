@@ -17,7 +17,8 @@ public class SignUp {
      * @param password is a password of user
      */
     @JsonCreator
-    public SignUp(final @JsonProperty("username") String username, final @JsonProperty("password") String password) {
+    public SignUp(@JsonProperty("username") final String username,
+                  @JsonProperty("password") final String password) {
         this.username = username;
         this.password = password;
     }

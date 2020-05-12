@@ -6,6 +6,9 @@ import it.sevenbits.hwspring.web.security.JwtTokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configures SignInService
+ */
 @Configuration
 public class SignInConfig {
 

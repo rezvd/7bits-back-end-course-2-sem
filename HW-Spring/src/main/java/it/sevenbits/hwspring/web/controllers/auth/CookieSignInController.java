@@ -40,7 +40,7 @@ public class CookieSignInController {
      */
     @PostMapping
     @ResponseBody
-    public ResponseEntity create(final @RequestBody SignIn signIn, final HttpServletResponse response) {
+    public ResponseEntity create(@RequestBody final SignIn signIn, final HttpServletResponse response) {
         User user = signInService.signIn(signIn);
         String token = tokenService.createToken(user);
         final int millis = 1000;

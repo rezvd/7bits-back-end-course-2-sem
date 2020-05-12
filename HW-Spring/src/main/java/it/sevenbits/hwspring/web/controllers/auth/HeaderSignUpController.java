@@ -37,7 +37,7 @@ public class HeaderSignUpController {
      */
     @PostMapping
     @ResponseBody
-    public Token create(final @RequestBody SignUp signUp) {
+    public Token create(@RequestBody final SignUp signUp) {
         User user = signUpService.signUp(signUp);
         String token = tokenService.createToken(user);
         return new Token(token);

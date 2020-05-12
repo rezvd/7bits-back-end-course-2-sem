@@ -15,7 +15,7 @@ public class Token {
      * @param token is a token in string type
      */
     @JsonCreator
-    public Token(final @JsonProperty("token") String token) {
+    public Token(@JsonProperty("token") final String token) {
         this.token = token;
     }
 

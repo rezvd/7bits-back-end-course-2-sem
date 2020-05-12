@@ -6,7 +6,9 @@ import it.sevenbits.hwspring.web.model.auth.SignIn;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
+/**
+ * Service for signing users in
+ */
 @Service
 public class SignInService {
 

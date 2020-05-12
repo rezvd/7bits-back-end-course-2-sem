@@ -2,6 +2,9 @@ package it.sevenbits.hwspring.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Model of request for updating user information
+ */
 public class UserPatchRequest {
 
     private final Boolean enabled;

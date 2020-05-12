@@ -2,6 +2,9 @@ package it.sevenbits.hwspring.web.service.signin;
 
 import org.springframework.security.core.AuthenticationException;
 
+/**
+ * Thrown when sign in fails
+ */
 public class SignInFailedException extends AuthenticationException {
 
     /**

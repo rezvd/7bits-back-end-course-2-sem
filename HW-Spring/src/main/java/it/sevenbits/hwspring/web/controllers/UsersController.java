@@ -53,7 +53,7 @@ public class UsersController {
      */
     @GetMapping(value = "/{id}")
     @ResponseBody
-    public ResponseEntity<User> getUserInfo(final @PathVariable("id") String id) throws ValidationException {
+    public ResponseEntity<User> getUserInfo(@PathVariable("id") final String id) throws ValidationException {
         if (!UUIDValidator.isValid(id)) {
             throw new ValidationException(String.format("ID \"%s\" is not valid", id));
         }

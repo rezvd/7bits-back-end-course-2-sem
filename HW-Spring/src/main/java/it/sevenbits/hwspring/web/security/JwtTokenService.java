@@ -5,10 +5,13 @@ import org.springframework.security.core.Authentication;
 
 import java.time.Duration;
 
+/**
+ * Service for work with JWT
+ */
 public interface JwtTokenService {
+
     /**
      * Getter for token duration
-     *
      * @return token duration
      */
     Duration getTokenExpiredIn();

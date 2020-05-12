@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import it.sevenbits.hwspring.core.model.Task;
 import java.util.List;
 
+/**
+ * Model of response to store tasks array and information about it
+ */
 public class GetAllTasksResponse {
 
     @JsonProperty("_meta")

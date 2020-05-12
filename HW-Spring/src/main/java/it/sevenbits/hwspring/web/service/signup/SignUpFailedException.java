@@ -2,6 +2,9 @@ package it.sevenbits.hwspring.web.service.signup;
 
 import org.springframework.security.core.AuthenticationException;
 
+/**
+ * Thrown when sign up fails
+ */
 public class SignUpFailedException extends AuthenticationException {
 
     /**
