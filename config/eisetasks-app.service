@@ -1,0 +1,15 @@
+[Unit]
+Description=Eisetasks task manager service
+After=nginx.service
+After=postgresql.service
+ 
+[Service]
+Type=simple
+WorkingDirectory=/opt/eisetasks/backend
+ExecStart=/usr/bin/java -jar server.jar
+User=eisetasks
+Restart=on-failure
+ 
+[Install]
+WantedBy=multi-user.target
+
